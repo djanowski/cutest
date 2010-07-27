@@ -26,8 +26,6 @@ def test(name = nil, &block)
   block.call(@_setup.call)
 end
 
-FILES = Dir["test/**/*_test.rb"]
-
 class Tester < Batch
   def report_errors
     return if @errors.empty?
@@ -38,29 +36,32 @@ class Tester < Batch
       $stderr.puts error, "\n"
     end
   end
-end
 
-Tester.each(FILES) do |file|
-  read, write = IO.pipe
+  def self.run(files)
+    each(files) do |file|
+      read, write = IO.pipe
 
-  fork do
-    read.close
+      fork do
+        read.close
 
-    begin
-      load file
-    rescue => e
-      error = [e.message] + e.backtrace.take_while { |line| !line.start_with?(__FILE__) }
-      write.write error.join("\n")
-      write.write "\n"
+        begin
+          load file
+        rescue => e
+          error = [e.message] + e.backtrace.take_while { |line| !line.start_with?(__FILE__) }
+          write.write error.join("\n")
+          write.write "\n"
+          write.close
+        end
+      end
+
       write.close
+
+      Process.wait
+
+      output = read.read
+      raise AssertionFailed.new(output) unless output.empty?
+      read.close
     end
   end
-
-  write.close
-
-  Process.wait
-
-  output = read.read
-  raise AssertionFailed.new(output) unless output.empty?
-  read.close
 end
+
