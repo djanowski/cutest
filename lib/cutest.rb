@@ -11,22 +11,23 @@ def assert(value)
   file, line = ex.backtrace.shift.split(":")
   code = File.readlines(file)[line.to_i - 1]
 
-  ex.message.replace("=> #{code.strip}\nin #{file}:#{line}")
+  ex.message.replace("=> #{code.strip}\n#{file}:#{line}")
 
   raise ex
 end
 
 def setup(&block)
-  @_setup = block
+  @_setup = block if block_given?
+  @_setup
 end
 
 def test(name = nil, &block)
   @_test = name
 
-  block.call(@_setup.call)
+  block.call(setup && setup.call)
 end
 
-class Tester < Batch
+class Cutest < Batch
   def report_errors
     return if @errors.empty?
 
@@ -45,7 +46,7 @@ class Tester < Batch
         read.close
 
         begin
-          load file
+          load(file, true)
         rescue => e
           error = [e.message] + e.backtrace.take_while { |line| !line.start_with?(__FILE__) }
           write.write error.join("\n")
@@ -64,4 +65,3 @@ class Tester < Batch
     end
   end
 end
-

@@ -1,9 +1,7 @@
-def foo
-  raise ArgumentError
+setup do
+  42
 end
 
-def bar
-  foo
+test "should return the result of evaluating the block" do |value|
+  assert value == 42
 end
-
-bar
