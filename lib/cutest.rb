@@ -28,7 +28,7 @@ def test(name = nil, &block)
 end
 
 class Cutest < Batch
-  VERSION = "0.0.1"
+  VERSION = "0.0.2"
 
   def report_errors
     return if @errors.empty?
@@ -40,7 +40,7 @@ class Cutest < Batch
     end
   end
 
-  def self.run(files)
+  def self.run(files, anonymous = false)
     each(files) do |file|
       read, write = IO.pipe
 
@@ -48,7 +48,7 @@ class Cutest < Batch
         read.close
 
         begin
-          load(file, true)
+          load(file, anonymous)
         rescue => e
           error = [e.message] + e.backtrace.take_while { |line| !line.start_with?(__FILE__) }
           write.write error.join("\n")

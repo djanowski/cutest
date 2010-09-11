@@ -8,10 +8,10 @@ Description
 
 Run tests in separate processes to avoid shared state.
 
-Each test file is loaded in a forked process and inside an anonymous
-module. Once a failure is found in a file, the rest of the file is
-skipped and the error is reported. This way, running your test suite
-feels faster.
+Each test file is loaded in a forked process and, if the second
+parameter to `Cutest.run` is true, inside an anonymous module. Once a
+failure is found in a file, the rest of the file is skipped and the
+error is reported. This way, running your test suite feels faster.
 
 There are no nested contexts, just the `setup` and `test` methods.
 Unlike other testing tools, the result of evaluating the setup is
