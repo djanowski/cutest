@@ -27,6 +27,8 @@ def flunk(caller = caller[1])
   raise ex
 end
 
+@_setup = nil
+
 def setup(&block)
   @_setup = block if block_given?
   @_setup
