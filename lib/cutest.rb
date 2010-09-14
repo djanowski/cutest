@@ -1,17 +1,28 @@
 require "batch"
 
-AssertionFailed = Class.new(StandardError)
+class AssertionFailed < StandardError; end
 
 def assert(value)
-  return if value
+  flunk unless value
+end
 
+def assert_raise(expected = Exception)
+  begin
+    yield
+  rescue => exception
+  ensure
+    flunk unless exception.kind_of?(expected)
+  end
+end
+
+def flunk(caller = caller[1])
   ex = AssertionFailed.new(@_test)
   ex.set_backtrace(caller)
 
   file, line = ex.backtrace.shift.split(":")
   code = File.readlines(file)[line.to_i - 1]
 
-  ex.message.replace("=> #{code.strip}\n#{file}:#{line}")
+  ex.message.replace(">> #{@_test}\n=> #{code.strip}\n   #{file} +#{line}")
 
   raise ex
 end
