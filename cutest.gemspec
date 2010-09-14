@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = "cutest"
-  s.version           = "0.0.3"
+  s.version           = "0.0.4"
   s.summary           = "Forking tests."
   s.description       = "Run tests in separate processes to avoid shared state."
   s.authors           = ["Damian Janowski", "Michel Martens"]
