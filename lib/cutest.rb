@@ -27,6 +27,13 @@ def flunk(caller = caller[1])
   raise ex
 end
 
+@_prepare = []
+
+def prepare(&block)
+  @_prepare << block if block_given?
+  @_prepare
+end
+
 @_setup = nil
 
 def setup(&block)
@@ -37,6 +44,7 @@ end
 def test(name = nil, &block)
   @_test = name
 
+  prepare.each { |block| block.call }
   block.call(setup && setup.call)
 end
 

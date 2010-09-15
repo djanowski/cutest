@@ -13,3 +13,11 @@ end
 test "...it should preserve the original values from the setup" do |params|
   assert 23 == params[:a]
 end
+
+setup do
+  "Hello world!"
+end
+
+test "only the most recently defined setup block is executed" do |value|
+  assert "Hello world!" == value
+end
