@@ -49,7 +49,7 @@ def test(name = nil, &block)
 end
 
 class Cutest < Batch
-  VERSION = "0.0.4"
+  VERSION = "0.0.5"
 
   def report_errors
     return if @errors.empty?
