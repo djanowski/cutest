@@ -64,7 +64,7 @@ end
 
 # Create a class where the block will be evaluated. Recomended to improve
 # isolation between tests.
-def scope(name = nil, &blk)
+def scope(&blk)
   Cutest::Scope.new(&blk).call
 end
 

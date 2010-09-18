@@ -2,7 +2,7 @@
 
 prepare { $foo = false }
 
-scope "Foo" do
+scope do
   @foo = true
 
   test "something" do
@@ -12,7 +12,7 @@ scope "Foo" do
   end
 end
 
-scope "Bar" do
+scope do
   test "something" do
     assert !$foo
     assert !defined?(@foo)
@@ -20,10 +20,10 @@ scope "Bar" do
   end
 end
 
-scope "Outer" do
+scope do
   @baz = true
 
-  scope "Inner" do
+  scope do
     test "something" do
       assert !defined?(@baz)
     end
