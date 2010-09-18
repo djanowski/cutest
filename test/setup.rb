@@ -21,3 +21,9 @@ end
 test "only the most recently defined setup block is executed" do |value|
   assert "Hello world!" == value
 end
+
+module Foo
+  test "works inside modules too" do |value|
+    assert "Hello world!" == value
+  end
+end

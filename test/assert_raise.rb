@@ -6,7 +6,7 @@ end
 
 
 test "raises if the expectation is not met" do
-  assert_raise(AssertionFailed) do
+  assert_raise(Cutest::AssertionFailed) do
     assert_raise(RuntimeError) do
       raise ArgumentError
     end

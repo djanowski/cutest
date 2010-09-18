@@ -3,7 +3,7 @@ test "succeeds if the value is true" do
 end
 
 test "raises if the assertion fails" do
-  assert_raise(AssertionFailed) do
+  assert_raise(Cutest::AssertionFailed) do
     assert false
   end
 end
