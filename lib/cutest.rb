@@ -1,7 +1,7 @@
 require "batch"
 
 class Cutest < Batch
-  VERSION = "0.0.5"
+  VERSION = "0.0.6"
 
   def report_errors
     return if @errors.empty?
