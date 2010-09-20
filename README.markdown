@@ -80,8 +80,10 @@ To run the tests:
 
 If you get an error, the report will look like this:
 
+    >> should preserve the original values from the setup
     => assert 24 == params[:a]
-    test/a_test.rb:14
+       test/a_test.rb +14
+
 
 Instead of a description of the error, you get to see the assertion
 that failed along with the file and line number. Adding a debugger and
