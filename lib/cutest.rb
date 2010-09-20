@@ -1,7 +1,7 @@
 require "batch"
 
 class Cutest < Batch
-  VERSION = "0.0.6"
+  VERSION = "0.1.0"
 
   def report_error(_, error)
     $stderr.puts "#{error}\n"
