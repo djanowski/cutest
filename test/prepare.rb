@@ -18,8 +18,8 @@ test "and are cumulative" do
   assert $foo == [true, false]
 end
 
-module Foo
-  test "and run inside modules" do
+scope do
+  test "and run inside scopes" do
     assert $foo = [true, false]
   end
 end

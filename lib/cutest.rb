@@ -3,14 +3,8 @@ require "batch"
 class Cutest < Batch
   VERSION = "0.0.6"
 
-  def report_errors
-    return if @errors.empty?
-
-    $stderr.puts "\nSome errors occured:\n\n"
-
-    @errors.each do |item, error|
-      $stderr.puts error, "\n"
-    end
+  def report_error(_, error)
+    $stderr.puts "#{error}\n"
   end
 
   def self.run(files, anonymous = false)
@@ -65,14 +59,14 @@ private
     Thread.current[:cutest]
   end
 
-  # Create a class where the block will be evaluated. Recomended to improve
+  # Create a class where the block will be evaluated. Recommended to improve
   # isolation between tests.
-  def scope(&blk)
-    Cutest::Scope.new(&blk).call
+  def scope(&block)
+    Cutest::Scope.new(&block).call
   end
 
   # Prepare the environment in order to run the tests. This method can be called
-  # many times, and each new block is appened to a list of preparation blocks.
+  # many times, and each new block is appended to a list of preparation blocks.
   # When a test is executed, all the preparation blocks are ran in the order they
   # were declared. If called without a block, it returns the array of preparation
   # blocks.
@@ -101,7 +95,10 @@ private
     cutest[:setup]
   end
 
-  # Call all the prepare blocks and setup blocks before executing the test. Even
+  # Kernel includes a test method for performing tests on files.
+  undef test if defined? test
+
+  # Call the prepare and setup blocks before executing the test. Even
   # though the assertions can live anywhere (it's not mandatory to put them
   # inside test blocks), it is necessary to wrap them in test blocks in order to
   # execute preparation and setup blocks.

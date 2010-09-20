@@ -8,16 +8,39 @@ Description
 
 Run tests in separate processes to avoid shared state.
 
-Each test file is loaded in a forked process and, if the second
-parameter to `Cutest.run` is true, inside an anonymous module. Once a
-failure is found in a file, the rest of the file is skipped and the
-error is reported. This way, running your test suite feels faster.
+Each test file is run in a forked process and, if the second parameter to
+`Cutest.run` is true, it is also loaded inside an anonymous module. Once a
+failure is found in a file, the rest of the file is skipped and the error is
+reported. This way, running your test suite feels faster.
 
-There are no nested contexts, just the `setup` and `test` methods.
-Unlike other testing tools, the result of evaluating the setup is
-passed as a parameter to each test. Even if you can still use instance
-variables, the code in the examples is the suggested way to keep tests
-from sharing information.
+You can use the `scope` command around tests: it guarantees that no instance
+variables are shared between tests.
+
+There are two commands very similar in nature, but with a subtle difference that
+makes them easy to combine in order to satisfy different needs: `prepare` and
+`setup`.
+
+The `prepare` blocks are executed before each test. If you call `prepare` many
+times, each passed block is appended to an array. When the test is run, all
+those prepare blocks are executed in order. The result of the block is
+discarded, so it is only useful for preparing the environment (flushing the
+database, removing a directory, etc.).
+
+The `setup` block is executed before each test and the result is passed as a
+parameter to the `test` block. Unlike `prepare`, each definition of `setup`
+overrides the previous one. Even if you can declare instance variables and
+share them between tests, the recommended usage is to pass the result of the
+block as a parameter to the `test` blocks.
+
+The `test` method executes the passed block after running `prepare` and
+`setup`. This is where assertions must be declared.
+
+Two assertions are available: `assert` and `assert_raise`. The first accepts a
+value and raises an `AssertionFailed` exception if it's false or nil, and the
+later receives an expected exception and a block: the block is executed and
+the raised exception is compared with the expected one. An `AssertionFailed`
+exception is raised if the block runs fine or if the raised exception doesn't
+match the expectation.
 
 Usage
 -----
@@ -50,6 +73,7 @@ In your tests:
       assert 23 == params[:a]
     end
 
+
 To run the tests:
 
     $ rake
@@ -63,6 +87,43 @@ Instead of a description of the error, you get to see the assertion
 that failed along with the file and line number. Adding a debugger and
 fixing the bug is left as an exercise for the reader.
 
+An example working with a prepare block:
+
+    prepare do
+      Ohm.flush
+    end
+
+    setup do
+      Ohm.redis.get("foo")
+    end
+
+    test do |foo|
+      assert foo.nil?
+    end
+
+And working with scopes:
+
+    setup do
+      @foo = true
+    end
+
+    @bar = true
+
+    scope do
+      test "should not share instance variables" do |foo|
+        assert !defined?(@foo)
+        assert !defined?(@bar)
+        assert foo == true
+      end
+    end
+
+The tests in these two examples will pass.
+
+Unlike other testing frameworks, Cutest does not compile all the tests before
+running them. Another shift in design is that one dot is shown after a file is
+examined, and not the usual one-dot-per-assertion. And finally, the execution
+of a file stops one the first failure is found.
+
 Installation
 ------------
 
@@ -71,7 +132,7 @@ Installation
 License
 -------
 
-Copyright (c) 2009 Damian Janowski and Michel Martens
+Copyright (c) 2010 Damian Janowski and Michel Martens
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
