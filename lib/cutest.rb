@@ -124,17 +124,13 @@ private
     end
   end
 
-  # Stop the tests and raise an error where the message is the last line executed
-  # before flunking.
-  def flunk(caller = caller[1])
-    ex = Cutest::AssertionFailed.new(@_test)
-    ex.set_backtrace(caller)
-
-    file, line = ex.backtrace.shift.split(":")
+  # Stop the tests and raise an error where the message is the last line
+  # executed before flunking.
+  def flunk
+    file, line = caller[1].split(":")
     code = File.readlines(file)[line.to_i - 1]
+    msg = ">> #{@_test}\n=> #{code.strip}\n   #{file} +#{line}"
 
-    ex.message.replace(">> #{@_test}\n=> #{code.strip}\n   #{file} +#{line}")
-
-    raise ex
+    raise Cutest::AssertionFailed.new(msg)
   end
 end
