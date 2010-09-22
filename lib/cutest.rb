@@ -16,10 +16,11 @@ class Cutest < Batch
 
         begin
           load(file, anonymous)
-        rescue => e
-          error = [e.message] + e.backtrace.take_while { |line| !line.start_with?(__FILE__) }
-          write.write error.join("\n")
-          write.write "\n"
+
+        rescue Exception => e
+          error = [e.message] +
+                  e.backtrace.take_while { |line| !line.index(__FILE__) }
+          write.puts error.join("\n")
           write.close
         end
       end
@@ -34,7 +35,11 @@ class Cutest < Batch
     end
   end
 
-  class AssertionFailed < StandardError; end
+  class AssertionFailed < StandardError
+    def backtrace
+      []
+    end
+  end
 
   class Scope
     def initialize(&scope)
