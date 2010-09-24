@@ -110,7 +110,7 @@ private
   def test(name = nil, &block)
     @_test = name
 
-    prepare.each { |block| block.call }
+    prepare.each { |blk| blk.call }
     block.call(setup && setup.call)
   end
 
