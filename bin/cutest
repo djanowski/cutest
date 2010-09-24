@@ -1,0 +1,9 @@
+#! /usr/bin/env ruby -rubygems
+
+require File.expand_path("../lib/cutest", File.dirname(__FILE__))
+
+if ARGV.empty?
+  puts "usage: cutest file ..."
+else
+  Cutest.run(Dir[*ARGV])
+end
