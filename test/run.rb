@@ -21,40 +21,33 @@ test "output of successful run" do
 end
 
 test "output of failed run" do
-  alternatives = [
-    ["  0% E\n100% \n", "\nSome errors occured:\n\n>> failed assertion\n=> assert false\n   test/fixtures/failure.rb +2\n\n"],
-    ["  0% E\n100% \n", "\nSome errors occured:\n\n>> failed assertion\n=> assert false\n   ./test/fixtures/failure.rb +2\n\n"]
-  ]
-
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/failure.rb"])
   end
 
-  assert alternatives.any? { |expected| [stdout, stderr] == expected }
+  assert stdout == "  0% E\n100% \n"
+  assert stderr["\nSome errors occured:\n\n>> failed assertion\n=> assert false\n"]
+  assert stderr["test/fixtures/failure.rb +2\n\n"]
 end
 
 test "output of failed run on a custom assertion" do
-  alternatives = [
-    ["  0% E\n100% \n", "\nSome errors occured:\n\n>> failed custom assertion\n=> assert_empty \"foo\"\n   test/fixtures/fail_custom_assertion.rb +6\n\n"],
-    ["  0% E\n100% \n", "\nSome errors occured:\n\n>> failed custom assertion\n=> assert_empty \"foo\"\n   ./test/fixtures/fail_custom_assertion.rb +6\n\n"]
-  ]
 
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/fail_custom_assertion.rb"])
   end
 
-  assert alternatives.any? { |expected| [stdout, stderr] == expected }
+  assert stdout == "  0% E\n100% \n"
+  assert stderr["\nSome errors occured:\n\n>> failed custom assertion\n=> assert_empty \"foo\"\n"]
+  assert stderr["test/fixtures/fail_custom_assertion.rb +6\n\n"]
 end
 
 test "output of failed run on an exception" do
-  alternatives = [
-    ["  0% E\n100% \n", "\nSome errors occured:\n\nOops\ntest/fixtures/exception.rb:2:in `foo'\ntest/fixtures/exception.rb:6:in `block in <top (required)>'\n\n"],
-    ["  0% E\n100% \n", "\nSome errors occured:\n\nOops\n./test/fixtures/exception.rb:2:in `foo'\n./test/fixtures/exception.rb:6\n\n"]
-  ]
-
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/exception.rb"])
   end
 
-  assert alternatives.any? { |expected| [stdout, stderr] == expected }
+  assert stdout == "  0% E\n100% \n"
+  assert stderr["\nSome errors occured:\n\nOops\n"]
+  assert stderr["test/fixtures/exception.rb:2:in `foo'\n"]
+  assert stderr["test/fixtures/exception.rb:6:in `block in <top (required)>'\n\n"]
 end
