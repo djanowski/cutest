@@ -47,7 +47,7 @@ test "output of failed run on an exception" do
   end
 
   assert stdout == "  0% E\n100% \n"
-  assert stderr["\nSome errors occured:\n\nOops\n"]
+  assert stderr["\nSome errors occured:\n\n>> some unhandled exception\nOops\n"]
   assert stderr["test/fixtures/exception.rb:2:in `foo'\n"]
-  assert stderr["test/fixtures/exception.rb:6:in `block in <top (required)>'\n\n"]
+  assert stderr["test/fixtures/exception.rb:6"]
 end

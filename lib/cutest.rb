@@ -17,11 +17,15 @@ class Cutest < Batch
         begin
           load(file, anonymous)
 
+        rescue Cutest::AssertionFailed => e
+          write.puts e.message
+
         rescue Exception => e
-          error = [e.message] +
-                  e.backtrace.take_while { |line| !line.index(__FILE__) }
+          error = [e.message]
+          error += e.backtrace.take_while { |line| !line.index(__FILE__) }
+
+          write.puts ">> #{cutest[:test]}"
           write.puts error.join("\n")
-          write.close
         end
       end
 
@@ -108,7 +112,7 @@ private
   # inside test blocks), it is necessary to wrap them in test blocks in order to
   # execute preparation and setup blocks.
   def test(name = nil, &block)
-    @_test = name
+    cutest[:test] = name
 
     prepare.each { |blk| blk.call }
     block.call(setup && setup.call)
@@ -134,7 +138,7 @@ private
   def flunk
     file, line = caller[1].split(":")
     code = File.readlines(file)[line.to_i - 1]
-    msg = ">> #{@_test}\n=> #{code.strip}\n   #{file} +#{line}"
+    msg = ">> #{cutest[:test]}\n=> #{code.strip}\n   #{file} +#{line}"
 
     raise Cutest::AssertionFailed.new(msg)
   end
