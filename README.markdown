@@ -78,12 +78,15 @@ To run the tests:
 
     $ rake
 
+A binary is shipped with Cutest, so you can alternatively run:
+
+    $ cutest test/*.rb
+
 If you get an error, the report will look like this:
 
     >> should preserve the original values from the setup
     => assert 24 == params[:a]
        test/a_test.rb +14
-
 
 Instead of a description of the error, you get to see the assertion
 that failed along with the file and line number. Adding a debugger and
@@ -124,7 +127,7 @@ The tests in these two examples will pass.
 Unlike other testing frameworks, Cutest does not compile all the tests before
 running them. Another shift in design is that one dot is shown after a file is
 examined, and not the usual one-dot-per-assertion. And finally, the execution
-of a file stops one the first failure is found.
+of a file stops when the first failure is found.
 
 Installation
 ------------
