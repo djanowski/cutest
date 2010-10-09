@@ -1,84 +1,38 @@
 require "batch"
+require "ruby-debug"
 
-begin
-  require "ruby-debug"
+Debugger.settings[:autoeval] = 1
+Debugger.settings[:autolist] = 1
+Debugger.settings[:listsize] = 10
+Debugger.settings[:reload_source_on_change] = 1
 
-  RETRY = true
-
-  Debugger.settings[:autoeval] = 1
-  Debugger.settings[:autolist] = 1
-  Debugger.settings[:listsize] = 10
-  Debugger.settings[:reload_source_on_change] = 1
-
-  def debug(&block)
-    Debugger.start(&block)
-  end
-
-  def breakpoint(message)
-    line, file = message.split.reverse
-    Debugger.add_breakpoint(file, line.to_i)
-  end
-rescue LoadError
-
-  RETRY = false
-
-  def breakpoint(message) # stub
-  end
-
-  def debug # stub
-    yield
-  end
+def breakpoint(backtrace)
+  file, line = backtrace.first.split(":")
+  Debugger.add_breakpoint(file, line.to_i)
 end
 
-class Cutest < Batch
+class Cutest
   VERSION = "0.1.5"
 
-  def report_error(_, error)
-    $stderr.puts "#{error}\n"
-  end
-
   def self.run(files, anonymous = false)
-    each(files) do |file|
-      read, write = IO.pipe
-
+    files.each do |file|
       fork do
-        read.close
-
-        debug do
+        Debugger.start do
           begin
             load(file, anonymous)
-
-          rescue Cutest::AssertionFailed => e
-            breakpoint(e.message)
-
-            retry if RETRY
-
-            write.puts e.message
-
           rescue Exception => e
-            error = [e.message]
-            error += e.backtrace.take_while { |line| !line.index(__FILE__) }
-
-            write.puts ">> #{cutest[:test]}"
-            write.puts error.join("\n")
+            breakpoint(e.backtrace)
+            retry
           end
         end
       end
 
-      write.close
-
       Process.wait
-
-      output = read.read
-      raise Cutest::AssertionFailed.new(output) unless output.empty?
-      read.close
     end
+    puts
   end
 
   class AssertionFailed < StandardError
-    def backtrace
-      []
-    end
   end
 
   class Scope
@@ -157,6 +111,7 @@ private
   # Assert that value is not nil or false.
   def assert(value)
     flunk unless value
+    print "."
   end
 
   # Assert that the block doesn't raise the expected exception.
@@ -166,16 +121,16 @@ private
     rescue => exception
     ensure
       flunk unless exception.kind_of?(expected)
+      print "."
     end
   end
 
   # Stop the tests and raise an error where the message is the last line
   # executed before flunking.
   def flunk
-    file, line = caller[1].split(":")
-    code = File.readlines(file)[line.to_i - 1]
-    msg = ">> #{cutest[:test]}\n=> #{code.strip}\n   #{file} +#{line}"
+    exception = Cutest::AssertionFailed.new
+    exception.set_backtrace([caller[1]])
 
-    raise Cutest::AssertionFailed.new(msg)
+    raise exception
   end
 end
