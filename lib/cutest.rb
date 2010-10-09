@@ -1,35 +1,45 @@
-require "batch"
 require "ruby-debug"
 
 Debugger.settings[:autoeval] = 1
 Debugger.settings[:autolist] = 1
-Debugger.settings[:listsize] = 10
+Debugger.settings[:listsize] = 5
 Debugger.settings[:reload_source_on_change] = 1
-
-def breakpoint(backtrace)
-  file, line = backtrace.first.split(":")
-  Debugger.add_breakpoint(file, line.to_i)
-end
 
 class Cutest
   VERSION = "0.1.5"
 
-  def self.run(files, anonymous = false)
+  def self.run(files, anonymous = true)
     files.each do |file|
-      fork do
-        Debugger.start do
-          begin
-            load(file, anonymous)
-          rescue Exception => e
-            breakpoint(e.backtrace)
-            retry
-          end
+      Debugger.start do
+        begin
+          load(file, anonymous)
+
+        rescue LoadError, SyntaxError
+          error([file, $!.message])
+          exit
+
+        rescue Exception
+          error($!)
+          hint
+
+          file, line = $!.backtrace.first.split(":")
+          Debugger.add_breakpoint(file, line.to_i)
+          retry
         end
       end
-
-      Process.wait
     end
+
     puts
+  end
+
+  def self.error(e)
+    puts
+    puts "-- \033[01;36mLast exception: \033[01;33m#{e}\033[00m"
+  end
+
+  def self.hint
+    puts "-- \033[01;36mType \033[0;33mcontinue\033[0;36m to retry " +
+         "or \033[0;33medit\033[0;36m to modify the source\033[00m"
   end
 
   class AssertionFailed < StandardError
