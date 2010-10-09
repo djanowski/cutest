@@ -11,7 +11,7 @@ ensure
 end
 
 test "output of successful run" do
-  expected = ".\n"
+  expected = "\n"
 
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/success.rb"])

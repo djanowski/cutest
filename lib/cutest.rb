@@ -8,25 +8,29 @@ Debugger.settings[:reload_source_on_change] = 1
 class Cutest
   VERSION = "0.1.5"
 
-  def self.run(files, anonymous = true)
+  def self.run(files)
     files.each do |file|
-      Debugger.start do
-        begin
-          load(file, anonymous)
+      fork do
+        Debugger.start do
+          begin
+            load(file)
 
-        rescue LoadError, SyntaxError
-          error([file, $!.message])
-          exit
+          rescue LoadError, SyntaxError
+            error([file, $!.message])
+            exit
 
-        rescue Exception
-          error($!)
-          hint
+          rescue Exception
+            error($!)
+            hint
 
-          file, line = $!.backtrace.first.split(":")
-          Debugger.add_breakpoint(file, line.to_i)
-          retry
+            file, line = $!.backtrace.first.split(":")
+            Debugger.add_breakpoint(file, line.to_i)
+            retry
+          end
         end
       end
+
+      Process.wait
     end
 
     puts
