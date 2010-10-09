@@ -9,8 +9,8 @@ class Cutest
   VERSION = "0.1.5"
 
   def self.run(files)
-    trap("INT")  { $_cutest_retry = true; exit }
-    trap("TERM") { $_cutest_retry = true; exit }
+    trap("INT")  { $_cutest_exit = true; exit }
+    trap("TERM") { $_cutest_exit = true; exit }
 
     files.each do |file|
       fork do
@@ -28,7 +28,7 @@ class Cutest
 
             file, line = $!.backtrace.first.split(":")
             Debugger.add_breakpoint(file, line.to_i)
-            retry unless $_cutest_retry
+            retry unless $_cutest_exit
           end
         end
       end
