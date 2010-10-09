@@ -3,7 +3,7 @@ require "batch"
 begin
   require "ruby-debug"
 
-  CUTEST_DEBUG_TRIES = 2
+  RETRY = true
 
   Debugger.settings[:autoeval] = 1
   Debugger.settings[:autolist] = 1
@@ -20,7 +20,7 @@ begin
   end
 rescue LoadError
 
-  CUTEST_DEBUG_TRIES = 1
+  RETRY = false
 
   def breakpoint(message) # stub
   end
@@ -44,7 +44,6 @@ class Cutest < Batch
       fork do
         read.close
 
-        tries = CUTEST_DEBUG_TRIES
         debug do
           begin
             load(file, anonymous)
@@ -52,8 +51,8 @@ class Cutest < Batch
           rescue Cutest::AssertionFailed => e
             breakpoint(e.message)
 
-            tries = tries - 1
-            retry if tries > 0
+            retry if RETRY
+
             write.puts e.message
 
           rescue Exception => e
