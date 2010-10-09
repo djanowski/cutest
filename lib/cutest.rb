@@ -5,18 +5,20 @@ Debugger.settings[:autolist] = 1
 Debugger.settings[:listsize] = 5
 Debugger.settings[:reload_source_on_change] = 1
 
+$_cutest_retry = true
+
 class Cutest
   VERSION = "0.1.5"
 
   def self.run(files)
-    trap("INT")  { $_cutest_exit = true; exit }
-    trap("TERM") { $_cutest_exit = true; exit }
+    trap("INT")  { $_cutest_retry = false; exit }
+    trap("TERM") { $_cutest_retry = false; exit }
 
     files.each do |file|
       fork do
         Debugger.start do
           begin
-            load(file)
+            silenced { load(file) }
 
           rescue LoadError, SyntaxError
             error([file, $!.message])
@@ -28,7 +30,7 @@ class Cutest
 
             file, line = $!.backtrace.first.split(":")
             Debugger.add_breakpoint(file, line.to_i)
-            retry unless $_cutest_exit
+            retry if $_cutest_retry
           end
         end
       end
@@ -47,6 +49,13 @@ class Cutest
   def self.hint
     puts "-- \033[01;36mType \033[0;33mcontinue\033[0;36m to retry " +
          "or \033[0;33medit\033[0;36m to modify the source\033[00m"
+  end
+
+  def self.silenced
+    old, $VERBOSE = $VERBOSE, nil
+    yield
+  ensure
+    $VERBOSE = old
   end
 
   class AssertionFailed < StandardError
