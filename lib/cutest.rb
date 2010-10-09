@@ -1,5 +1,35 @@
 require "batch"
 
+begin
+  require "ruby-debug"
+
+  CUTEST_DEBUG_TRIES = 2
+
+  Debugger.settings[:autoeval] = 1
+  Debugger.settings[:autolist] = 1
+  Debugger.settings[:listsize] = 10
+  Debugger.settings[:reload_source_on_change] = 1
+
+  def debug(&block)
+    Debugger.start(&block)
+  end
+
+  def breakpoint(message)
+    line, file = message.split.reverse
+    Debugger.add_breakpoint(file, line.to_i)
+  end
+rescue LoadError
+
+  CUTEST_DEBUG_TRIES = 1
+
+  def breakpoint(message) # stub
+  end
+
+  def debug # stub
+    yield
+  end
+end
+
 class Cutest < Batch
   VERSION = "0.1.5"
 
@@ -14,18 +44,25 @@ class Cutest < Batch
       fork do
         read.close
 
-        begin
-          load(file, anonymous)
+        tries = CUTEST_DEBUG_TRIES
+        debug do
+          begin
+            load(file, anonymous)
 
-        rescue Cutest::AssertionFailed => e
-          write.puts e.message
+          rescue Cutest::AssertionFailed => e
+            breakpoint(e.message)
 
-        rescue Exception => e
-          error = [e.message]
-          error += e.backtrace.take_while { |line| !line.index(__FILE__) }
+            tries = tries - 1
+            retry if tries > 0
+            write.puts e.message
 
-          write.puts ">> #{cutest[:test]}"
-          write.puts error.join("\n")
+          rescue Exception => e
+            error = [e.message]
+            error += e.backtrace.take_while { |line| !line.index(__FILE__) }
+
+            write.puts ">> #{cutest[:test]}"
+            write.puts error.join("\n")
+          end
         end
       end
 
