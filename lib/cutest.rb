@@ -15,40 +15,56 @@ class Cutest
     trap("TERM") { $_cutest_retry = false; exit }
 
     files.each do |file|
-      fork do
-        Debugger.start do
-          begin
-            silenced { load(file) }
+      Debugger.start do
 
-          rescue LoadError, SyntaxError
-            error([file, $!.message])
-            exit
+        while $_cutest_retry
 
-          rescue Exception
-            error($!)
-            hint
+          stdin, stdout = IO.pipe
 
-            file, line = $!.backtrace.first.split(":")
+          fork do
+            stdin.close
+
+            begin
+              load(file)
+
+            rescue LoadError, SyntaxError
+              puts
+              puts error([file, $!.message])
+              exit
+
+            rescue Exception
+              file, line = $!.backtrace.first.split(":")
+              stdout.write("#{file}\n#{line}\n#{error($!)}\n#{hint}")
+            end
+          end
+
+          stdout.close
+
+          Process.wait
+
+          output = stdin.read
+
+          unless output.empty?
+            file, line, error, hint = output.split("\n")
             Debugger.add_breakpoint(file, line.to_i)
-            retry if $_cutest_retry
+            puts ["\n", error, hint]
+          else
+            break
           end
         end
       end
-
-      Process.wait
     end
 
     puts
   end
 
   def self.error(e)
-    puts
-    puts "-- \033[01;36mLast exception: \033[01;33m#{e}\033[00m"
+    "-- \033[01;36mLast exception: \033[01;33m#{e}\033[00m"
   end
 
   def self.hint
-    puts "-- \033[01;36mType \033[0;33mcontinue\033[0;36m to retry " +
-         "or \033[0;33medit\033[0;36m to modify the source\033[00m"
+    "-- \033[01;36mType \033[0;33mcontinue\033[0;36m to retry " +
+    "or \033[0;33medit\033[0;36m to modify the source\033[00m"
   end
 
   def self.silenced
