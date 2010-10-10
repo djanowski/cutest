@@ -3,7 +3,56 @@
 require File.expand_path("../lib/cutest", File.dirname(__FILE__))
 
 if ARGV.empty?
-  puts "usage: cutest file ..."
-else
-  Cutest.run(Dir[*ARGV])
+  puts "usage: cutest [-r lib] [-v] file ..."
+  exit
 end
+
+class Cutest
+
+  # Clap: Command line argument parsing.
+  # http://github.com/soveran/clap
+  # http://rubygems.org/gems/clap
+  class Clap
+    VERSION = "0.0.1"
+
+    attr :argv
+    attr :opts
+
+    def self.run(args, opts)
+      new(args, opts).run
+    end
+
+    def initialize(argv, opts)
+      @argv = argv.reverse.dup
+      @opts = opts
+    end
+
+    def run
+      args = []
+
+      while argv.any?
+        item = argv.pop
+
+        if opts[item]
+
+          # Call the lambda with N items from argv,
+          # where N is the lambda's arity.
+          opts[item].call(*argv.pop(opts[item].arity))
+        else
+
+          # Collect the items that don't correspond to
+          # flags.
+          args << item
+        end
+      end
+
+      args
+    end
+  end
+end
+
+files = Cutest::Clap.run ARGV,
+  "-r" => lambda { |file| require file },
+  "-v" => lambda { puts Cutest::VERSION }
+
+Cutest.run(Dir[*files]) if files.any?
