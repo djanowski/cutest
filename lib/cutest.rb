@@ -15,12 +15,8 @@ class Cutest
   VERSION = "1.0.0.beta"
 
   def self.run(files)
-    trap("INT")  { exit }
-    trap("TERM") { exit }
-
     files.each do |file|
       Debugger.start do
-
         loop do
           stdin, stdout = IO.pipe
 
