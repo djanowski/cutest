@@ -8,10 +8,10 @@ Description
 
 Run tests in separate processes to avoid shared state.
 
-Each test file is run in a forked process and, if the second parameter to
-`Cutest.run` is true, it is also loaded inside an anonymous module. Once a
-failure is found in a file, the rest of the file is skipped and the error is
-reported. This way, running your test suite feels faster.
+Each test file is run in a forked process and. Once a failure is found in a
+file, you get a debugger and the ability to fix the error in place. If you
+choose to quit the debugger, the rest of the file is skipped. This way, doing
+TDD is easier and running your test suite feels faster.
 
 You can use the `scope` command around tests: it guarantees that no instance
 variables are shared between tests.
@@ -50,10 +50,14 @@ In your Rakefile:
     require "cutest"
 
     task :test do
-      Cutest.run(Dir["test/*"])
+      Cutest.run(Dir["test/*.rb"])
     end
 
     task :default => :test
+
+Or from the command line:
+
+    $ cutest test/*.rb
 
 In your tests:
 
@@ -72,25 +76,6 @@ In your tests:
     test "should preserve the original values from the setup" do |params|
       assert 23 == params[:a]
     end
-
-
-To run the tests:
-
-    $ rake
-
-A binary is shipped with Cutest, so you can alternatively run:
-
-    $ cutest test/*.rb
-
-If you get an error, the report will look like this:
-
-    >> should preserve the original values from the setup
-    => assert 24 == params[:a]
-       test/a_test.rb +14
-
-Instead of a description of the error, you get to see the assertion
-that failed along with the file and line number. Adding a debugger and
-fixing the bug is left as an exercise for the reader.
 
 An example working with a prepare block:
 
@@ -125,9 +110,29 @@ And working with scopes:
 The tests in these two examples will pass.
 
 Unlike other testing frameworks, Cutest does not compile all the tests before
-running them. Another shift in design is that one dot is shown after a file is
-examined, and not the usual one-dot-per-assertion. And finally, the execution
-of a file stops when the first failure is found.
+running them.
+
+Handling errors
+---------------
+
+If you get an error when running the tests, you will see a debugger prompt:
+
+    Exception: Cutest::AssertionFailed
+    Type continue to retry or edit to modify the source
+    .Breakpoint 1 at test/setup.rb:14
+    [12, 16] in test/setup.rb
+       12
+       13  test "should preserve the original values from the setup" do |params|
+    => 14    assert 24 == params[:a]
+       15  end
+       16
+    test/setup.rb:14
+    assert 24 == params[:a]
+    (rdb:1)
+
+Instead of a getting a report of the error, you get to interact with it live
+and even fix it: if you type `edit`, the file is opened in your editor. Once
+you fix the code and save it, the debugger will reload it and retry.
 
 Installation
 ------------
