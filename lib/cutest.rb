@@ -51,7 +51,7 @@ class Cutest
             puts ["\n", error, hint]
 
             Debugger.breakpoints.each do |breakpoint|
-              breakpoint.enabled = false
+              Debugger.remove_breakpoint(breakpoint.id)
             end
 
             Debugger.add_breakpoint(fn, ln.to_i)
