@@ -1,4 +1,10 @@
-require "ruby-debug"
+begin
+  require "ruby-debug"
+rescue LoadError
+  puts "Cutest needs ruby-debug, but it couldn't be required."
+  puts "Please install ruby-debug or ruby-debug19 and try again."
+  exit
+end
 
 Debugger.settings[:autoeval] = 1
 Debugger.settings[:autolist] = 1
