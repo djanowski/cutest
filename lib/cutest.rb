@@ -38,6 +38,8 @@ class Cutest
               fn, ln = $!.backtrace.first.split(":")
               stdout.write("#{fn}\n#{ln}\n#{error($!)}\n#{hint}")
             end
+
+            stdout.close
           end
 
           stdout.close
@@ -46,10 +48,17 @@ class Cutest
 
           output = stdin.read
 
+          stdin.close
+
           unless output.empty?
             fn, ln, error, hint = output.split("\n")
-            Debugger.add_breakpoint(fn, ln.to_i)
             puts ["\n", error, hint]
+
+            Debugger.breakpoints.each do |breakpoint|
+              breakpoint.enabled = false
+            end
+
+            Debugger.add_breakpoint(fn, ln.to_i)
           else
             break
           end
