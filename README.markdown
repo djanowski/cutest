@@ -6,12 +6,9 @@ Forking tests.
 Description
 -----------
 
-Run tests in separate processes to avoid shared state.
-
-Each test file is run in a forked process and. Once a failure is found in a
-file, you get a debugger and the ability to fix the error in place. If you
-choose to quit the debugger, the rest of the file is skipped. This way, doing
-TDD is easier and running your test suite feels faster.
+Each test file is run in a forked process to avoid shared state. Once a failure
+is found, you get a debugger and the ability to fix the error in place. If you
+choose to quit the debugger, the rest of the file is skipped.
 
 You can use the `scope` command around tests: it guarantees that no instance
 variables are shared between tests.
@@ -133,6 +130,17 @@ If you get an error when running the tests, you will see a debugger prompt:
 Instead of a getting a report of the error, you get to interact with it live
 and even fix it: if you type `edit`, the file is opened in your editor. Once
 you fix the code and save it, the debugger will reload it and retry.
+
+Command Line Interface
+----------------------
+
+The tool `cutest` accepts a list of files and sends them to `Cutest.run`. If
+you need to require a file or library before running the tests, as is the case
+with test helpers, use the `-r` flag:
+
+    $ cutest -r test/helper.rb test/*_test.rb
+
+If you want to check which version you are running, try the `-v` flag.
 
 Installation
 ------------
