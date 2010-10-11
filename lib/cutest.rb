@@ -12,7 +12,7 @@ Debugger.settings[:listsize] = 5
 Debugger.settings[:reload_source_on_change] = 1
 
 class Cutest
-  VERSION = "0.1.5"
+  VERSION = "1.0.0.beta"
 
   def self.run(files)
     trap("INT")  { exit }
