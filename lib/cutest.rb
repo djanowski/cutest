@@ -10,6 +10,7 @@ Debugger.settings[:autoeval] = 1
 Debugger.settings[:autolist] = 1
 Debugger.settings[:listsize] = 5
 Debugger.settings[:reload_source_on_change] = 1
+Debugger::RDEBUG_SCRIPT = $0
 
 class Cutest
   VERSION = "1.0.0.beta"
