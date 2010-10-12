@@ -10,12 +10,30 @@ Debugger.settings[:autoeval] = 1
 Debugger.settings[:autolist] = 1
 Debugger.settings[:listsize] = 5
 Debugger.settings[:reload_source_on_change] = 1
-Debugger::RDEBUG_SCRIPT = $0
 
 class Cutest
   VERSION = "1.0.0.beta"
 
+  class QuietIO < IO
+    BLACKLIST = /^(Re exec|Debugger was not called)/
+
+    def initialize
+      super(1, "w")
+    end
+
+    def write(*args)
+      super(*args) if allow?(*args)
+    end
+
+  private
+    def allow?(*args)
+      args.all? { |arg| arg !~ BLACKLIST }
+    end
+  end
+
   def self.run(files)
+    $stdout.reopen(QuietIO.new)
+
     files.each do |file|
       Debugger.start do
         loop do
