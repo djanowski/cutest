@@ -89,8 +89,8 @@ class Cutest
   end
 
   def self.hint
-    "\033[01;36mType \033[0;33mcontinue\033[0;36m to retry " +
-    "or \033[0;33medit\033[0;36m to modify the source\033[00m"
+    "\033[01;36mType \033[0;33m(R)estart\033[0;36m to start over " +
+    "or \033[0;33m(ed)it\033[0;36m to modify the source.\033[00m"
   end
 
   class AssertionFailed < StandardError
