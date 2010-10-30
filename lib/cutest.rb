@@ -1,83 +1,56 @@
-begin
-  require "ruby-debug"
-rescue LoadError
-  puts "Cutest needs ruby-debug, but it couldn't be required."
-  puts "Please install ruby-debug or ruby-debug19 and try again."
-  exit
-end
-
-Debugger.settings[:autoeval] = 1
-Debugger.settings[:autolist] = 1
-Debugger.settings[:listsize] = 5
-Debugger.settings[:reload_source_on_change] = 1
-
 class Cutest
   VERSION = "1.0.0.beta"
 
-  class QuietIO < IO
-    BLACKLIST = /^(Re exec|Debugger was not called)/
-
-    def initialize
-      super(1, "w")
+  if ENV["DEBUG"]
+    begin
+      require "ruby-debug"
+    rescue LoadError
+      puts "Cutest needs ruby-debug, but it couldn't be required."
+      puts "Please install ruby-debug or ruby-debug19 and try again."
+      exit
     end
 
-    def write(*args)
-      super(*args) if allow?(*args)
-    end
-
-  private
-    def allow?(*args)
-      args.all? { |arg| arg !~ BLACKLIST }
-    end
+    Debugger.settings[:autoeval] = 1
+    Debugger.settings[:autolist] = 1
+    Debugger.settings[:listsize] = 5
+    Debugger.settings[:reload_source_on_change] = 1
   end
 
   def self.run(files)
-    $stdout.reopen(QuietIO.new)
-
     files.each do |file|
-      Debugger.start do
-        loop do
-          stdin, stdout = IO.pipe
+      stdin, stdout = IO.pipe
 
-          fork do
-            stdin.close
+      fork do
+        stdin.close
 
-            begin
-              load(file)
+        begin
+          load(file)
 
-            rescue LoadError, SyntaxError
-              puts ["\n", error([file, $!.message])]
-              exit
+        rescue LoadError, SyntaxError
+          puts ["\n", error([file, $!.message])]
+          exit
 
-            rescue Exception
-              fn, ln = $!.backtrace.first.split(":")
-              stdout.write("#{fn}\n#{ln}\n#{error($!)}\n#{hint}")
-            end
-
-            stdout.close
-          end
-
-          stdout.close
-
-          Process.wait
-
-          output = stdin.read
-
-          stdin.close
-
-          unless output.empty?
-            fn, ln, error, hint = output.split("\n")
-            puts ["\n", error, hint]
-
-            Debugger.breakpoints.each do |breakpoint|
-              Debugger.remove_breakpoint(breakpoint.id)
-            end
-
-            Debugger.add_breakpoint(fn, ln.to_i)
-          else
-            break
-          end
+        rescue Exception
+          fn, ln = $!.backtrace.first.split(":")
+          message = File.readlines(fn)[ln.to_i - 1]
+          stdout.write("#{fn}\n#{ln}\n#{error(message.strip)} # #{$!.message}")
         end
+
+        stdout.close
+      end
+
+      stdout.close
+
+      Process.wait
+
+      output = stdin.read
+
+      stdin.close
+
+      unless output.empty?
+        fn, ln, error = output.split("\n")
+
+        puts "\n#{error}\n#{fn} +#{ln}"
       end
     end
 
@@ -86,11 +59,6 @@ class Cutest
 
   def self.error(e)
     "\033[01;36mException: \033[01;33m#{e}\033[00m"
-  end
-
-  def self.hint
-    "\033[01;36mType \033[0;33m(R)estart\033[0;36m to start over " +
-    "or \033[0;33m(ed)it\033[0;36m to modify the source.\033[00m"
   end
 
   class AssertionFailed < StandardError
@@ -171,7 +139,13 @@ private
 
   # Assert that value is not nil or false.
   def assert(value)
-    flunk unless value
+    flunk("assertion failed") unless value
+    print "."
+  end
+
+  # Assert that two values are equal.
+  def assert_equal(value, other)
+    flunk("#{value} != #{other}") unless value == other
     print "."
   end
 
@@ -181,15 +155,15 @@ private
       yield
     rescue => exception
     ensure
-      flunk unless exception.kind_of?(expected)
+      flunk("got #{exception} instead") unless exception.kind_of?(expected)
       print "."
     end
   end
 
   # Stop the tests and raise an error where the message is the last line
   # executed before flunking.
-  def flunk
-    exception = Cutest::AssertionFailed.new
+  def flunk(message = nil)
+    exception = Cutest::AssertionFailed.new(message)
     exception.set_backtrace([caller[1]])
 
     raise exception

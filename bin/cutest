@@ -3,7 +3,7 @@
 require File.expand_path("../lib/cutest", File.dirname(__FILE__))
 
 if ARGV.empty?
-  puts "usage: cutest [-r lib] [-v] file ..."
+  puts "usage: cutest [-r lib] [-v] [--debug] file ..."
   exit
 end
 
@@ -13,7 +13,7 @@ class Cutest
   # http://github.com/soveran/clap
   # http://rubygems.org/gems/clap
   class Clap
-    VERSION = "0.0.1"
+    VERSION = "0.0.2"
 
     attr :argv
     attr :opts
@@ -23,7 +23,7 @@ class Cutest
     end
 
     def initialize(argv, opts)
-      @argv = argv.reverse
+      @argv = argv.dup
       @opts = opts
     end
 
@@ -31,13 +31,24 @@ class Cutest
       args = []
 
       while argv.any?
-        item = argv.pop
 
-        if opts[item]
+        item = argv.shift
+        flag = opts[item]
+
+        if flag
+
+          # Work around lambda semantics in 1.8.7.
+          arity = [flag.arity, 0].max
+
+          # Raise if there are not enough parameters
+          # available for the flag.
+          if argv.size < arity
+            raise ArgumentError
+          end
 
           # Call the lambda with N items from argv,
           # where N is the lambda's arity.
-          opts[item].call(*argv.pop(opts[item].arity))
+          flag.call(*argv.shift(arity))
         else
 
           # Collect the items that don't correspond to
@@ -52,7 +63,8 @@ class Cutest
 end
 
 files = Cutest::Clap.run ARGV,
-  "-r" => lambda { |file| require file },
-  "-v" => lambda { puts Cutest::VERSION }
+  "-r"      => lambda { |file| require file },
+  "-v"      => lambda { puts Cutest::VERSION },
+  "--debug" => lambda { ENV["DEBUG"] = true }
 
 Cutest.run(Dir[*files]) if files.any?
