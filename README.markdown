@@ -7,8 +7,8 @@ Description
 -----------
 
 Each test file is run in a forked process to avoid shared state. Once a failure
-is found, you get a debugger and the ability to fix the error in place. If you
-choose to quit the debugger, the rest of the file is skipped.
+is found, you get a report detailing what failed and how to locate the error
+and the rest of the file is skipped.
 
 You can use the `scope` command around tests: it guarantees that no instance
 variables are shared between tests.
@@ -32,12 +32,11 @@ block as a parameter to the `test` blocks.
 The `test` method executes the passed block after running `prepare` and
 `setup`. This is where assertions must be declared.
 
-Two assertions are available: `assert` and `assert_raise`. The first accepts a
-value and raises an `AssertionFailed` exception if it's false or nil, and the
-later receives an expected exception and a block: the block is executed and
-the raised exception is compared with the expected one. An `AssertionFailed`
-exception is raised if the block runs fine or if the raised exception doesn't
-match the expectation.
+Three assertions are available: `assert`, that accepts a value and raises
+if it's false or nil; `assert_equal`, that raises if its arguments are not
+equal; and `assert_raise`, that executes a passed block and compares the raised
+exception to the expected one. In all cases, if the expectation is no met, an
+`AssertionFailed` exception is raised.
 
 Usage
 -----
@@ -112,24 +111,10 @@ running them.
 Handling errors
 ---------------
 
-If you get an error when running the tests, you will see a debugger prompt:
+If you get an error when running the tests, this is what you will see:
 
-    Exception: Cutest::AssertionFailed
-    Type continue to retry or edit to modify the source
-    .Breakpoint 1 at test/setup.rb:14
-    [12, 16] in test/setup.rb
-       12
-       13  test "should preserve the original values from the setup" do |params|
-    => 14    assert 24 == params[:a]
-       15  end
-       16
-    test/setup.rb:14
-    assert 24 == params[:a]
-    (rdb:1)
-
-Instead of a getting a report of the error, you get to interact with it live
-and even fix it: if you type `edit`, the file is opened in your editor. Once
-you fix the code and save it, the debugger will reload it and retry.
+    Exception: assert_equal 24, params[:a] # 24 != 23
+    test/setup.rb +14
 
 Command Line Interface
 ----------------------
@@ -141,6 +126,8 @@ with test helpers, use the `-r` flag:
     $ cutest -r test/helper.rb test/*_test.rb
 
 If you want to check which version you are running, try the `-v` flag.
+
+If you want to require ruby-debug, use the `--debug` flag.
 
 Installation
 ------------

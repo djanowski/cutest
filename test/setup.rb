@@ -11,7 +11,7 @@ test "if the params are modified..." do |params|
 end
 
 test "...it should preserve the original values from the setup" do |params|
-  assert 23 == params[:a]
+  assert_equal 23, params[:a]
 end
 
 setup do
