@@ -1,5 +1,5 @@
 class Cutest
-  VERSION = "1.0.0.beta"
+  VERSION = "1.0.0.beta1"
 
   if ENV["DEBUG"]
     begin
