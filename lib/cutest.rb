@@ -140,13 +140,13 @@ private
   # Assert that value is not nil or false.
   def assert(value)
     flunk("assertion failed") unless value
-    print "."
+    success
   end
 
   # Assert that two values are equal.
   def assert_equal(value, other)
-    flunk("#{value} != #{other}") unless value == other
-    print "."
+    flunk("#{value.inspect} != #{other.inspect}") unless value == other
+    success
   end
 
   # Assert that the block doesn't raise the expected exception.
@@ -156,7 +156,7 @@ private
     rescue => exception
     ensure
       flunk("got #{exception} instead") unless exception.kind_of?(expected)
-      print "."
+      success
     end
   end
 
@@ -167,5 +167,10 @@ private
     exception.set_backtrace([caller[1]])
 
     raise exception
+  end
+
+  # Executed when an assertion succeeds.
+  def success
+    print "."
   end
 end
