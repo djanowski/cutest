@@ -155,7 +155,7 @@ private
       yield
     rescue => exception
     ensure
-      flunk("got #{exception} instead") unless exception.kind_of?(expected)
+      flunk("got #{exception.inspect} instead") unless exception.kind_of?(expected)
       success
     end
   end
