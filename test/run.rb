@@ -21,7 +21,7 @@ test "output of successful run" do
 end
 
 test "output of failed run" do
-  expected = "\n\e[01;36mException: \e[01;33massert false\e[00m # assertion failed\ntest/fixtures/failure.rb +2\n\n"
+  expected = "\n\e[01;36mException: \e[01;33massert false\e[00m # assertion failed\n./test/fixtures/failure.rb +2\n\n"
 
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/failure.rb"])
@@ -31,7 +31,7 @@ test "output of failed run" do
 end
 
 test "output of failed run" do
-  expected = "\n\e[01;36mException: \e[01;33mraise \"Oops\"\e[00m # Oops\ntest/fixtures/exception.rb +2\n\n"
+  expected = "\n\e[01;36mException: \e[01;33mraise \"Oops\"\e[00m # Oops\n./test/fixtures/exception.rb +2\n\n"
 
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/exception.rb"])
@@ -41,7 +41,7 @@ test "output of failed run" do
 end
 
 test "output of custom assertion" do
-  expected = "\n\e[01;36mException: \e[01;33massert_empty \"foo\"\e[00m # not empty\ntest/fixtures/fail_custom_assertion.rb +7\n\n"
+  expected = "\n\e[01;36mException: \e[01;33massert_empty \"foo\"\e[00m # not empty\n./test/fixtures/fail_custom_assertion.rb +7\n\n"
 
   stdout, stderr = capture do
     Cutest.run(Dir["test/fixtures/fail_custom_assertion.rb"])
