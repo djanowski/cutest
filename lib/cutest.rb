@@ -1,21 +1,6 @@
 class Cutest
   VERSION = "1.0.0"
 
-  if ENV["DEBUG"]
-    begin
-      require "ruby-debug"
-    rescue LoadError
-      puts "Cutest needs ruby-debug, but it couldn't be required."
-      puts "Please install ruby-debug or ruby-debug19 and try again."
-      exit
-    end
-
-    Debugger.settings[:autoeval] = 1
-    Debugger.settings[:autolist] = 1
-    Debugger.settings[:listsize] = 5
-    Debugger.settings[:reload_source_on_change] = 1
-  end
-
   def self.run(files)
     files.each do |file|
       stdin, stdout = IO.pipe

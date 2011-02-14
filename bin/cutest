@@ -3,7 +3,7 @@
 require File.expand_path("../lib/cutest", File.dirname(__FILE__))
 
 if ARGV.empty?
-  puts "usage: cutest [-r lib] [-v] [--debug] file ..."
+  puts "usage: cutest [-r lib] [-v] file ..."
   exit
 end
 
@@ -64,7 +64,6 @@ end
 
 files = Cutest::Clap.run ARGV,
   "-r"      => lambda { |file| require file },
-  "-v"      => lambda { puts Cutest::VERSION },
-  "--debug" => lambda { ENV["DEBUG"] = true }
+  "-v"      => lambda { puts Cutest::VERSION }
 
 Cutest.run(Dir[*files]) if files.any?

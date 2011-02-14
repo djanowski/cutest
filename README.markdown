@@ -127,8 +127,6 @@ with test helpers, use the `-r` flag:
 
 If you want to check which version you are running, try the `-v` flag.
 
-If you want to require ruby-debug, use the `--debug` flag.
-
 Installation
 ------------
 
