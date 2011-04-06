@@ -67,7 +67,7 @@ files = Cutest::Clap.run ARGV,
   "-v"      => lambda { puts Cutest::VERSION }
 
 case files.size
-when 0 then return
+when 0 then exit
 when 1 then Cutest.run_file(files.first)
 else        Cutest.run(Dir[*files])
 end
