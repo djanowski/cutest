@@ -3,7 +3,7 @@ class Cutest
 
   def self.run(files)
     files.each do |file|
-      print `./bin/cutest #{file}`.chomp
+      print `cutest #{file}`.chomp
     end
 
     puts
