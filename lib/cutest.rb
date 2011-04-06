@@ -3,40 +3,24 @@ class Cutest
 
   def self.run(files)
     files.each do |file|
-      stdin, stdout = IO.pipe
+      print `./bin/cutest #{file}`.chomp
+    end
 
-      fork do
-        stdin.close
+    puts
+  end
 
-        begin
-          load(file)
+  def self.run_file(file)
+    begin
+      load(file)
 
-        rescue LoadError, SyntaxError
-          puts ["\n", error([file, $!.message])]
-          exit
+    rescue LoadError, SyntaxError
+      puts ["\n", error([file, $!.message])]
+      exit
 
-        rescue Exception
-          fn, ln = $!.backtrace.first.split(":")
-          message = File.readlines(fn)[ln.to_i - 1]
-          stdout.write("#{fn}\n#{ln}\n#{error(message.strip)} # #{$!.message}")
-        end
-
-        stdout.close
-      end
-
-      stdout.close
-
-      Process.wait
-
-      output = stdin.read
-
-      stdin.close
-
-      unless output.empty?
-        fn, ln, error = output.split("\n")
-
-        puts "\n#{error}\n#{fn} +#{ln}"
-      end
+    rescue Exception
+      fn, ln = $!.backtrace.first.split(":")
+      message = File.readlines(fn)[ln.to_i - 1]
+      puts "\n#{error(message.strip)} # #{$!.message}\n#{fn} +#{ln}"
     end
 
     puts
