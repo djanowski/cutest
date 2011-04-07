@@ -63,7 +63,7 @@ class Cutest
 end
 
 files = Cutest::Clap.run ARGV,
-  "-r"      => lambda { |file| require file },
+  "-r"      => lambda { |file| Cutest::REQUIREMENTS.push(file) },
   "-v"      => lambda { puts Cutest::VERSION }
 
 case files.size

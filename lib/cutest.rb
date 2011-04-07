@@ -1,9 +1,14 @@
 class Cutest
   VERSION = "1.0.1"
+  REQUIREMENTS = []
+
+  def self.flags
+    "-r #{REQUIREMENTS.join(" ")}" if REQUIREMENTS.any?
+  end
 
   def self.run(files)
     files.each do |file|
-      print `cutest #{file}`.chomp
+      %x{cutest #{flags} #{file}}.chomp.display
     end
 
     puts
@@ -11,6 +16,8 @@ class Cutest
 
   def self.run_file(file)
     begin
+      REQUIREMENTS.each { |r| require r }
+
       load(file)
 
     rescue LoadError, SyntaxError
