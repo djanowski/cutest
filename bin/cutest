@@ -68,6 +68,6 @@ files = Cutest::Clap.run ARGV,
 
 case files.size
 when 0 then exit
-when 1 then Cutest.run_file(files.first)
+when 1 then Cutest.run_file(files.first) && puts
 else        Cutest.run(Dir[*files])
 end

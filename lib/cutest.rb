@@ -1,6 +1,30 @@
 class Cutest
   VERSION = "1.1.0.rc1"
   REQUIREMENTS = []
+  FILTER = %r[/#{RUBY_ENGINE}[-/]([0-9\.])+]
+  CACHE = Hash.new { |h, k| h[k] = File.readlines(k) }
+
+  module Color
+    def self.title(str)
+      "\033[01;36m#{str}"
+    end
+
+    def self.exception(str)
+      "\033[1;33m#{str}"
+    end
+
+    def self.code(str)
+      "\033[00m#{str}"
+    end
+
+    def self.location(str)
+      "\033[01;30m#{str}"
+    end
+
+    def self.reset
+      "\033[00m"
+    end
+  end
 
   def self.flags
     "-r #{REQUIREMENTS.join(" ")}" if REQUIREMENTS.any?
@@ -9,6 +33,8 @@ class Cutest
   def self.run(files)
     files.each do |file|
       %x{cutest #{flags} #{file}}.chomp.display
+
+      break unless $?.success?
     end
 
     puts
@@ -21,20 +47,35 @@ class Cutest
       load(file)
 
     rescue LoadError, SyntaxError
-      puts ["\n", error([file, $!.message])]
-      exit
+      display_error
+      exit 1
 
     rescue Exception
-      fn, ln = $!.backtrace.first.split(":")
-      message = File.readlines(fn)[ln.to_i - 1]
-      puts "\n#{error(message.strip)} # #{$!.message}\n#{fn} +#{ln}"
-    end
+      display_error
 
-    puts
+      trace = $!.backtrace
+      pivot = trace.index { |line| line.match(file) }
+      other = trace[0..pivot].select { |line| line !~ FILTER }
+      other.reverse.each { |trace| display_trace(trace) }
+      exit 1
+    end
   end
 
-  def self.error(e)
-    "\033[01;36mException: \033[01;33m#{e}\033[00m"
+  def self.code(fn, ln)
+    CACHE[fn][ln.to_i - 1].strip
+  end
+
+  def self.display_error
+    print Color.title("\n\n#{$!.class}: ")
+    print Color.exception("#{$!.message}\n\n")
+  end
+
+  def self.display_trace(line)
+    fn, ln = line.split(":")
+
+    print Color.code("- #{code(fn, ln)}")
+    print Color.location(" #{fn} +#{ln}\n")
+    print Color.reset
   end
 
   class AssertionFailed < StandardError
@@ -115,7 +156,7 @@ private
 
   # Assert that value is not nil or false.
   def assert(value)
-    flunk("assertion failed") unless value
+    flunk("expression returned #{value.inspect}") unless value
     success
   end
 
