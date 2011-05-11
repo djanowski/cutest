@@ -68,6 +68,7 @@ class Cutest
   def self.display_error
     print Color.title("\n\n#{$!.class}: ")
     print Color.exception("#{$!.message}\n\n")
+    print Color.reset
   end
 
   def self.display_trace(line)
