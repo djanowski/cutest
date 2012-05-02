@@ -1,4 +1,5 @@
-require File.expand_path("../lib/cutest", File.dirname(__FILE__))
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'cutest'
 
 if ARGV.empty?
   puts "usage: cutest [-r lib] [-v] file ..."
