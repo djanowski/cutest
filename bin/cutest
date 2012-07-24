@@ -1,4 +1,6 @@
-require File.expand_path("../lib/cutest", File.dirname(__FILE__))
+#!/usr/bin/env ruby
+
+require_relative "../lib/cutest"
 
 if ARGV.empty?
   puts "usage: cutest [-r lib] [-v] file ..."
@@ -61,11 +63,9 @@ class Cutest
 end
 
 files = Cutest::Clap.run ARGV,
-  "-r"      => lambda { |file| Cutest::REQUIREMENTS.push(file) },
+  "-r"      => lambda { |file| require file },
   "-v"      => lambda { puts Cutest::VERSION }
 
-case files.size
-when 0 then exit
-when 1 then Cutest.run_file(files.first) && puts
-else        Cutest.run(Dir[*files])
+if files.any?
+  Cutest.run(Dir[*files])
 end

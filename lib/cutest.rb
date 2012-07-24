@@ -1,38 +1,13 @@
 class Cutest
   VERSION = "1.1.3"
-  REQUIREMENTS = []
   FILTER = %r[/(ruby|jruby|rbx)[-/]([0-9\.])+]
   CACHE = Hash.new { |h, k| h[k] = File.readlines(k) }
 
-  module Color
-    def self.title(str)
-      "\033[01;36m#{str}"
-    end
-
-    def self.exception(str)
-      "\033[1;33m#{str}"
-    end
-
-    def self.code(str)
-      "\033[00m#{str}"
-    end
-
-    def self.location(str)
-      "\033[01;30m#{str}"
-    end
-
-    def self.reset
-      "\033[00m"
-    end
-  end
-
-  def self.flags
-    "-r #{REQUIREMENTS.join(" ")}" if REQUIREMENTS.any?
-  end
-
   def self.run(files)
     files.each do |file|
-      %x{cutest #{flags} #{file}}.chomp.display
+      run_file(file)
+
+      Process.wait
 
       break unless $?.success?
     end
@@ -41,23 +16,23 @@ class Cutest
   end
 
   def self.run_file(file)
-    begin
-      REQUIREMENTS.each { |r| require r }
+    fork do
+      begin
+        load(file)
 
-      load(file)
+      rescue LoadError, SyntaxError
+        display_error
+        exit 1
 
-    rescue LoadError, SyntaxError
-      display_error
-      exit 1
+      rescue Exception
+        display_error
 
-    rescue Exception
-      display_error
-
-      trace = $!.backtrace
-      pivot = trace.index { |line| line.match(file) }
-      other = trace[0..pivot].select { |line| line !~ FILTER }
-      other.reverse.each { |trace| display_trace(trace) }
-      exit 1
+        trace = $!.backtrace
+        pivot = trace.index { |line| line.match(file) }
+        other = trace[0..pivot].select { |line| line !~ FILTER }
+        other.reverse.each { |trace| display_trace(trace) }
+        exit 1
+      end
     end
   end
 
@@ -66,17 +41,15 @@ class Cutest
   end
 
   def self.display_error
-    print Color.title("\n\n#{$!.class}: ")
-    print Color.exception("#{$!.message}\n\n")
-    print Color.reset
+    print "\n\n#{$!.class}: "
+    print "#{$!.message}\n\n"
   end
 
   def self.display_trace(line)
     fn, ln = line.split(":")
 
-    print Color.code("- #{code(fn, ln)}")
-    print Color.location(" #{fn} +#{ln}\n")
-    print Color.reset
+    print "- #{code(fn, ln)}"
+    print " #{fn} +#{ln}\n"
   end
 
   class AssertionFailed < StandardError
