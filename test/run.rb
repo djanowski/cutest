@@ -1,57 +1,35 @@
-__END__
-require "stringio"
-
-def capture
-  stdout, $stdout = $stdout, StringIO.new
-  stderr, $stderr = $stderr, StringIO.new
-  yield
-  [$stdout.string, $stderr.string]
-ensure
-  $stdout = stdout
-  $stderr = stderr
-end
-
 test "output of successful run" do
   expected = ".\n"
 
-  stdout, stderr = capture do
-    Cutest.run(Dir["test/fixtures/success.rb"])
-  end
+  out = %x{./bin/cutest test/fixtures/success.rb}
 
-  assert_equal(stdout, expected)
+  assert_equal(expected, out)
 end
 
 test "output of failed run" do
-  expected = "\e[01;36m\n\nCutest::AssertionFailed: \e[1;33mexpression retur" +
-             "ned false\n\n\e[00m- assert false\e[01;30m test/fixtures/failu" +
-             "re.rb +2\n\e[00m\n"
+  expected = "\n\nCutest::AssertionFailed: expression returned false" +
+             "\n\n- assert false test/fixtures/failure.rb +2\n\n"
 
-  stdout, stderr = capture do
-    Cutest.run(Dir["test/fixtures/failure.rb"])
-  end
+  out = %x{./bin/cutest test/fixtures/failure.rb}
 
-  assert_equal(stdout, expected)
+  assert_equal(expected, out)
 end
 
 test "output of failed run" do
-  expected = "\e[01;36m\n\nRuntimeError: \e[1;33mOops\n\n\e[00m- raise \"Oop" +
-             "s\"\e[01;30m test/fixtures/exception.rb +2\n\e[00m\n"
+  expected = "\n\nRuntimeError: Oops\n\n- raise \"Oop" +
+             "s\" test/fixtures/exception.rb +2\n\n"
 
-  stdout, stderr = capture do
-    Cutest.run(Dir["test/fixtures/exception.rb"])
-  end
+  out = %x{./bin/cutest test/fixtures/exception.rb}
 
-  assert_equal(stdout, expected)
+  assert_equal(expected, out)
 end
 
 test "output of custom assertion" do
-  expected = "\e[01;36m\n\nCutest::AssertionFailed: \e[1;33mnot empty\n\n\e[" +
-             "00m- assert_empty \"foo\"\e[01;30m test/fixtures/fail_custom_a" +
-             "ssertion.rb +7\n\e[00m\n"
+  expected = "\n\nCutest::AssertionFailed: not empty\n\n" +
+             "- assert_empty \"foo\" test/fixtures/fail_custom_a" +
+             "ssertion.rb +7\n\n"
 
-  stdout, stderr = capture do
-    Cutest.run(Dir["test/fixtures/fail_custom_assertion.rb"])
-  end
+  out = %x{./bin/cutest test/fixtures/fail_custom_assertion.rb}
 
-  assert_equal(stdout, expected)
+  assert_equal(expected, out)
 end
