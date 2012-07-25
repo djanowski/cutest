@@ -24,13 +24,19 @@ class Cutest
         display_error
         exit 1
 
-      rescue Exception
+      rescue StandardError
         display_error
 
         trace = $!.backtrace
         pivot = trace.index { |line| line.match(file) }
-        other = trace[0..pivot].select { |line| line !~ FILTER }
-        other.reverse.each { |trace| display_trace(trace) }
+
+        if pivot
+          other = trace[0..pivot].select { |line| line !~ FILTER }
+          other.reverse.each { |trace| display_trace(trace) }
+        else
+          display_trace(trace.first)
+        end
+
         exit 1
       end
     end
@@ -48,8 +54,8 @@ class Cutest
   def self.display_trace(line)
     fn, ln = line.split(":")
 
-    print "- #{code(fn, ln)}"
-    print " #{fn} +#{ln}\n"
+    puts "  line: #{code(fn, ln)}"
+    puts "  file: #{fn} +#{ln}"
   end
 
   class AssertionFailed < StandardError

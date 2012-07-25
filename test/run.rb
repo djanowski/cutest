@@ -7,8 +7,9 @@ test "output of successful run" do
 end
 
 test "output of failed run" do
-  expected = "\n\nCutest::AssertionFailed: expression returned false" +
-             "\n\n- assert false test/fixtures/failure.rb +2\n\n"
+  expected = "\n\nCutest::AssertionFailed: expression returned false\n\n" +
+             "  line: assert false\n" +
+             "  file: test/fixtures/failure.rb +2\n\n"
 
   out = %x{./bin/cutest test/fixtures/failure.rb}
 
@@ -16,8 +17,9 @@ test "output of failed run" do
 end
 
 test "output of failed run" do
-  expected = "\n\nRuntimeError: Oops\n\n- raise \"Oop" +
-             "s\" test/fixtures/exception.rb +2\n\n"
+  expected = "\n\nRuntimeError: Oops\n\n" +
+             "  line: raise \"Oops\"\n" +
+             "  file: test/fixtures/exception.rb +2\n\n"
 
   out = %x{./bin/cutest test/fixtures/exception.rb}
 
@@ -26,10 +28,20 @@ end
 
 test "output of custom assertion" do
   expected = "\n\nCutest::AssertionFailed: not empty\n\n" +
-             "- assert_empty \"foo\" test/fixtures/fail_custom_a" +
-             "ssertion.rb +7\n\n"
+             "  line: assert_empty \"foo\"\n" +
+             "  file: test/fixtures/fail_custom_assertion.rb +7\n\n"
 
   out = %x{./bin/cutest test/fixtures/fail_custom_assertion.rb}
+
+  assert_equal(expected, out)
+end
+
+test "output of failure in nested file" do
+  expected = "\n\nCutest::AssertionFailed: expression returned false\n\n" +
+             "  line: assert false\n" +
+             "  file: test/fixtures/failure.rb +2\n\n"
+
+  out = %x{./bin/cutest test/fixtures/failure_in_loaded_file.rb}
 
   assert_equal(expected, out)
 end
