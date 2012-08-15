@@ -32,7 +32,7 @@ class Cutest
 
         if pivot
           other = trace[0..pivot].select { |line| line !~ FILTER }
-          other.reverse.each { |trace| display_trace(trace) }
+          other.each { |line| display_trace(line) }
         else
           display_trace(trace.first)
         end
@@ -43,7 +43,11 @@ class Cutest
   end
 
   def self.code(fn, ln)
-    CACHE[fn][ln.to_i - 1].strip
+    begin
+      CACHE[fn][ln.to_i - 1].strip
+    rescue
+      "(Can't display line)"
+    end
   end
 
   def self.display_error
