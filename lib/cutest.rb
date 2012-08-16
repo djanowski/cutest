@@ -1,5 +1,5 @@
 class Cutest
-  VERSION = "1.2.0.rc1"
+  VERSION = "1.2.0.rc2"
   FILTER = %r[/(ruby|jruby|rbx)[-/]([0-9\.])+]
   CACHE = Hash.new { |h, k| h[k] = File.readlines(k) }
 
