@@ -25,17 +25,17 @@ class Cutest
         exit 1
 
       rescue StandardError
-        display_error
-
         trace = $!.backtrace
         pivot = trace.index { |line| line.match(file) }
 
         if pivot
           other = trace[0..pivot].select { |line| line !~ FILTER }
-          other.each { |line| display_trace(line) }
+          other.reverse.each { |line| display_trace(line) }
         else
           display_trace(trace.first)
         end
+
+        display_error
 
         exit 1
       end
@@ -51,8 +51,8 @@ class Cutest
   end
 
   def self.display_error
-    print "\n\n#{$!.class}: "
-    print "#{$!.message}\n\n"
+    print "\n#{$!.class}: "
+    print "#{$!.message}\n"
   end
 
   def self.display_trace(line)
