@@ -4,42 +4,37 @@ class Cutest
   CACHE = Hash.new { |h, k| h[k] = File.readlines(k) }
 
   def self.run(files)
-    files.each do |file|
-      run_file(file)
+    exceptions = files.flat_map { |file| run_file(file) }
 
-      Process.wait
-
-      break unless $?.success?
+    exceptions.each do |exc, file|
+      display_trace(exc, file)
+      display_error(exc)
     end
-
-    puts
   end
 
   def self.run_file(file)
+    reader, writer = IO.pipe
+
     fork do
+      reader.close
+
       begin
+        print "#{file}: ["
         load(file)
-
+        print "]\n"
+        Marshal.dump(cutest[:exceptions], writer)
       rescue LoadError, SyntaxError
-        display_error
-        exit 1
-
-      rescue StandardError
-        trace = $!.backtrace
-        pivot = trace.index { |line| line.match(file) }
-
-        if pivot
-          other = trace[0..pivot].select { |line| line !~ FILTER }
-          other.reverse.each { |line| display_trace(line) }
-        else
-          display_trace(trace.first)
-        end
-
-        display_error
-
+        display_error($!)
         exit 1
       end
     end
+
+    Process.wait
+    exit unless $?.success?
+
+    writer.close
+    exceptions = Marshal.load(reader.read)
+    exceptions.map { |e| [e, file] }
   end
 
   def self.code(fn, ln)
@@ -50,16 +45,29 @@ class Cutest
     end
   end
 
-  def self.display_error
-    print "\n#{$!.class}: "
-    print "#{$!.message}\n"
+  def self.display_error(exception)
+    print "#{exception.class}: "
+    print "#{exception.message}\n"
   end
 
-  def self.display_trace(line)
+  def self.display_trace(exception, file)
+    trace = exception.backtrace
+    pivot = trace.index { |line| line.match(file) }
+
+    if pivot
+      other = trace[0..pivot].select { |line| line !~ FILTER }
+      other.reverse.each { |trace| display_trace_location(trace) }
+    else
+      display_trace_location(trace.first)
+    end
+  end
+
+  def self.display_trace_location(line)
     fn, ln = line.split(":")
 
-    puts "  line: #{code(fn, ln)}"
-    puts "  file: #{fn} +#{ln}"
+    puts
+    puts "file: #{fn} +#{ln}"
+    puts "line: #{code(fn, ln)}"
   end
 
   class AssertionFailed < StandardError
@@ -81,7 +89,7 @@ private
 
   # Use Thread.current[:cutest] to store information about test preparation
   # and setup.
-  Thread.current[:cutest] ||= { :prepare => [] }
+  Thread.current[:cutest] ||= { :prepare => [], :exceptions => [] }
 
   # Shortcut to access Thread.current[:cutest].
   def cutest
@@ -136,32 +144,30 @@ private
 
     prepare.each { |blk| blk.call }
     block.call(setup && setup.call)
+    success
+  rescue StandardError => exception
+    cutest[:exceptions] << exception
+    exception.kind_of?(Cutest::AssertionFailed) ? failure : other_exception
   end
 
   # Assert that value is not nil or false.
   def assert(value)
     flunk("expression returned #{value.inspect}") unless value
-    success
   end
 
   # Assert that two values are equal.
   def assert_equal(value, other)
     flunk("#{value.inspect} != #{other.inspect}") unless value == other
-    success
   end
 
   # Assert that the block doesn't raise the expected exception.
   def assert_raise(expected = Exception)
-    begin
-      yield
-    rescue => exception
-    ensure
-      flunk("got #{exception.inspect} instead") unless exception.kind_of?(expected)
-      success
-    end
+    yield
+  rescue => exception
+    flunk("got #{exception.inspect} instead") unless exception.kind_of?(expected)
   end
 
-  # Stop the tests and raise an error where the message is the last line
+  # Raise an error where the message is the last line
   # executed before flunking.
   def flunk(message = nil)
     exception = Cutest::AssertionFailed.new(message)
@@ -173,5 +179,15 @@ private
   # Executed when an assertion succeeds.
   def success
     print "."
+  end
+
+  # Executed when a cutest assertion fails.
+  def failure
+    print "F"
+  end
+
+  # Executed when a non-cutest exception is raised
+  def other_exception
+    print "E"
   end
 end
