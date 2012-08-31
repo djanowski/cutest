@@ -30,6 +30,8 @@ class Cutest
         trace = $!.backtrace
         pivot = trace.index { |line| line.match(file) }
 
+        puts "\n  test: %s" % cutest[:test]
+
         if pivot
           other = trace[0..pivot].select { |line| line !~ FILTER }
           other.reverse.each { |line| display_trace(line) }

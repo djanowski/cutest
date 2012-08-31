@@ -7,7 +7,9 @@ test "output of successful run" do
 end
 
 test "output of failed run" do
-  expected = "  line: assert false\n" +
+  expected = "\n" +
+             "  test: failed assertion\n" +
+             "  line: assert false\n" +
              "  file: test/fixtures/failure.rb +2\n\n" +
              "Cutest::AssertionFailed: expression returned false\n\n"
 
@@ -17,7 +19,9 @@ test "output of failed run" do
 end
 
 test "output of failed run" do
-  expected = "  line: raise \"Oops\"\n" +
+  expected = "\n" +
+             "  test: some unhandled exception\n" +
+             "  line: raise \"Oops\"\n" +
              "  file: test/fixtures/exception.rb +2\n\n" +
              "RuntimeError: Oops\n\n"
 
@@ -27,7 +31,9 @@ test "output of failed run" do
 end
 
 test "output of custom assertion" do
-  expected = "  line: assert_empty \"foo\"\n" +
+  expected = "\n" +
+             "  test: failed custom assertion\n" +
+             "  line: assert_empty \"foo\"\n" +
              "  file: test/fixtures/fail_custom_assertion.rb +7\n\n" +
              "Cutest::AssertionFailed: not empty\n\n"
 
@@ -37,7 +43,9 @@ test "output of custom assertion" do
 end
 
 test "output of failure in nested file" do
-  expected = "  line: assert false\n" +
+  expected = "\n" +
+             "  test: failed assertion\n" +
+             "  line: assert false\n" +
              "  file: test/fixtures/failure.rb +2\n\n" +
              "Cutest::AssertionFailed: expression returned false\n\n"
 
