@@ -138,8 +138,10 @@ private
   def test(name = nil, &block)
     cutest[:test] = name
 
-    prepare.each { |blk| blk.call }
-    block.call(setup && setup.call)
+    if !cutest[:only] || cutest[:only] == name
+      prepare.each { |blk| blk.call }
+      block.call(setup && setup.call)
+    end
   end
 
   # Assert that value is not nil or false.
