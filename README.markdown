@@ -123,7 +123,7 @@ The tool `cutest` accepts a list of files and sends them to `Cutest.run`. If
 you need to require a file or library before running the tests, as is the case
 with test helpers, use the `-r` flag:
 
-    $ cutest -r test/helper.rb test/*_test.rb
+    $ cutest -r ./test/helper.rb ./test/*_test.rb
 
 If you want to check which version you are running, try the `-v` flag.
 
