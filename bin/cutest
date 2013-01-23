@@ -9,7 +9,7 @@ require_relative "../lib/cutest"
 require_relative "../lib/cutest/vendor/clap"
 
 files = Clap.run ARGV,
-  "-r"      => lambda { |file| require file },
+  "-r"      => lambda { |file| require File.expand_path(file) },
   "-o"      => lambda { |name| cutest[:only] = name },
   "-v"      => lambda { puts Cutest::VERSION }
 
