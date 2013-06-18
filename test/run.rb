@@ -6,6 +6,11 @@ test "output of successful run" do
   assert_equal(expected, out)
 end
 
+test "exit code of successful run" do
+  %x{./bin/cutest test/fixtures/success.rb}
+  assert_equal 0, $?.to_i
+end
+
 test "output of failed run" do
   expected = "\n" +
              "  test: failed assertion\n" +
@@ -28,6 +33,11 @@ test "output of failed run" do
   out = %x{./bin/cutest test/fixtures/exception.rb}
 
   assert_equal(expected, out)
+end
+
+test "exit code of failed run" do
+  %x{./bin/cutest test/fixtures/failure.rb}
+  assert $?.to_i != 0
 end
 
 test "output of custom assertion" do
