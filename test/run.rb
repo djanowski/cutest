@@ -37,6 +37,7 @@ end
 
 test "exit code of failed run" do
   %x{./bin/cutest test/fixtures/failure.rb}
+
   assert $?.to_i != 0
 end
 

@@ -14,5 +14,7 @@ files = Clap.run ARGV,
   "-v"      => lambda { puts Cutest::VERSION }
 
 if files.any?
-  Cutest.run(Dir[*files])
+  success = Cutest.run(Dir[*files])
+
+  exit(1) unless success
 end
