@@ -6,15 +6,21 @@ class Cutest
   end
 
   def self.run(files)
+    exit_code = 0
+
     files.each do |file|
       run_file(file)
 
       Process.wait
 
-      break unless $?.success?
+      unless $?.success?
+        exit_code = 1
+        break
+      end
     end
 
     puts
+    exit exit_code
   end
 
   def self.run_file(file)
