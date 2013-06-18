@@ -41,17 +41,7 @@ exception to the expected one. In all cases, if the expectation is no met, an
 Usage
 -----
 
-In your Rakefile:
-
-    require "cutest"
-
-    task :test do
-      Cutest.run(Dir["test/*.rb"])
-    end
-
-    task :default => :test
-
-Or from the command line:
+In your terminal:
 
     $ cutest test/*.rb
 
@@ -116,7 +106,25 @@ If you get an error when running the tests, this is what you will see:
     Exception: assert_equal 24, params[:a] # 24 != 23
     test/setup.rb +14
 
-Command Line Interface
+Running the build
+-----------------
+
+Using Rake:
+
+    task :test do
+      exec "cutest test/*.rb"
+    end
+
+    task :default => :test
+
+Using Make:
+
+    .PHONY: test
+
+    test:
+      cutest test/*.rb
+
+Command-line interface
 ----------------------
 
 The tool `cutest` accepts a list of files and sends them to `Cutest.run`. If
