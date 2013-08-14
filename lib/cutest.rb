@@ -6,15 +6,17 @@ class Cutest
   end
 
   def self.run(files)
-    files.each do |file|
+    status = files.all? do |file|
       run_file(file)
 
       Process.wait
 
-      break unless $?.success?
+      $?.success?
     end
 
     puts
+
+    status
   end
 
   def self.run_file(file)
