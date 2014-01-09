@@ -94,8 +94,10 @@ private
 
   # Create a class where the block will be evaluated. Recommended to improve
   # isolation between tests.
-  def scope(&block)
-    Cutest::Scope.new(&block).call
+  def scope(name = nil, &block)
+    if !cutest[:scope] || cutest[:scope] == name
+      Cutest::Scope.new(&block).call
+    end
   end
 
   # Prepare the environment in order to run the tests. This method can be
