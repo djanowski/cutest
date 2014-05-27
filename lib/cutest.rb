@@ -9,9 +9,7 @@ class Cutest
     status = files.all? do |file|
       run_file(file)
 
-      Process.wait
-
-      $?.success?
+      Process.wait2.last.success?
     end
 
     puts
