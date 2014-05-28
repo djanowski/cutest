@@ -1,1 +1,1 @@
-load("test/fixtures/failure.rb")
+load(File.realpath("test/fixtures/failure.rb"))
