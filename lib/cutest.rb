@@ -142,6 +142,8 @@ private
       prepare.each { |blk| blk.call }
       block.call(setup && setup.call)
     end
+
+    cutest[:test] = nil
   end
 
   # Assert that value is not nil or false.

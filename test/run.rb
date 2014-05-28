@@ -64,3 +64,15 @@ test "output of failure in nested file" do
 
   assert_equal(expected, out)
 end
+
+test "output of failure outside block" do
+  expected = ".\n" +
+  "  test: \n" +
+  "  line: assert false\n" +
+  "  file: test/fixtures/outside_block.rb +5\n\n" +
+  "Cutest::AssertionFailed: expression returned false\n\n"
+
+  out = %x{./bin/cutest test/fixtures/outside_block.rb}
+
+  assert_equal(expected, out)
+end
