@@ -11,6 +11,7 @@ require_relative "../lib/cutest/vendor/clap"
 files = Clap.run ARGV,
   "-r"      => lambda { |file| require file },
   "-o"      => lambda { |name| cutest[:only] = name },
+  "-s"      => lambda { |name| cutest[:scope] = name },
   "-v"      => lambda { puts Cutest::VERSION }
 
 if files.any?
