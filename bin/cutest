@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 if ARGV.empty?
-  puts "usage: cutest [-r lib] [-v] file ..."
+  puts "usage: cutest [-v] [-r lib] [-o test] [-s scope] file ..."
   exit
 end
 
