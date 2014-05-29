@@ -1,3 +1,8 @@
+(unreleased)
+============
+
+* Use `-s` to run a single scope.
+
 1.2.1 - 2013-08-14
 ==================
 
