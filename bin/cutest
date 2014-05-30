@@ -6,7 +6,7 @@ if ARGV.empty?
 end
 
 require_relative "../lib/cutest"
-require_relative "../lib/cutest/vendor/clap"
+require "clap"
 
 files = Clap.run ARGV,
   "-r"      => lambda { |file| require file },
