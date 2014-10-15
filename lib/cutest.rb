@@ -5,11 +5,19 @@ class Cutest
     CACHE = Hash.new { |h, k| h[k] = File.readlines(k) }
   end
 
+  def self.use_fork?
+    !(ENV['NO_FORK'] == 'true')
+  end
+
   def self.run(files)
     status = files.all? do |file|
-      run_file(file)
+      success = run_file(file)
 
-      Process.wait2.last.success?
+      if use_fork?
+        Process.wait2.last.success?
+      else
+        success
+      end
     end
 
     puts
@@ -17,14 +25,22 @@ class Cutest
     status
   end
 
+  def self.forked &block
+    if use_fork?
+      fork &block
+    else
+      block.call
+    end
+  end
+
   def self.run_file(file)
-    fork do
+    forked do
       begin
         load(file)
 
       rescue LoadError, SyntaxError
         display_error
-        exit 1
+        exit 1 if use_fork?
 
       rescue StandardError
         trace = $!.backtrace
@@ -41,7 +57,7 @@ class Cutest
 
         display_error
 
-        exit 1
+        exit 1 if use_fork?
       end
     end
   end
