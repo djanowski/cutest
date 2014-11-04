@@ -165,6 +165,7 @@ private
     begin
       yield
     rescue => exception
+      exception.message
     ensure
       flunk("got #{exception.inspect} instead") unless exception.kind_of?(expected)
       success
