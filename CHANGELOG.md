@@ -1,5 +1,7 @@
-(unreleased)
-============
+1.2.2 - 2014-11-05
+==================
+
+* `assert_raise` now returns the raised exception.
 
 * Use `-s` to run a single scope.
 
