@@ -11,3 +11,12 @@ test "raises if the expectation is not met" do
     end
   end
 end
+
+test "returns the exception" do
+  exception = assert_raise(RuntimeError) do
+    raise RuntimeError, "error"
+  end
+
+  assert_equal "error", exception.message
+end
+
