@@ -152,12 +152,16 @@ private
   def assert(value)
     flunk("expression returned #{value.inspect}") unless value
     success
+
+    value
   end
 
   # Assert that two values are equal.
   def assert_equal(value, other)
     flunk("#{value.inspect} != #{other.inspect}") unless value == other
     success
+
+    true
   end
 
   # Assert that the block doesn't raise the expected exception.
