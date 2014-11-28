@@ -38,6 +38,10 @@ equal; and `assert_raise`, that executes a passed block and compares the raised
 exception to the expected one. In all cases, if the expectation is no met, an
 `AssertionFailed` exception is raised.
 
+You can customize the output of `assert` by providing a second argument with
+a string you want to get as an error report if the assertion is not fulfilled.
+This can also be used as a simple building block to build custom assertions.
+
 Usage
 -----
 
@@ -97,6 +101,16 @@ The tests in these two examples will pass.
 
 Unlike other testing frameworks, Cutest does not compile all the tests before
 running them.
+
+A simple example for adding a custom `empty` assertion:
+
+    def assert_empty(string)
+      assert(string.empty?, "not empty")
+    end
+
+    test "failed custom assertion" do
+      assert_empty "foo"
+    end
 
 Handling errors
 ---------------
