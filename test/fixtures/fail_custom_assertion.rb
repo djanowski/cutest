@@ -1,6 +1,5 @@
 def assert_empty(string)
-  flunk("not empty") unless string.empty?
-  success
+  assert(string.empty?, "not empty")
 end
 
 test "failed custom assertion" do
