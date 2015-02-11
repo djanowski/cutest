@@ -20,3 +20,8 @@ test "returns the exception" do
   assert_equal "error", exception.message
 end
 
+test "catches a custom exception" do
+  assert_raise do
+    raise Class.new(Exception)
+  end
+end
