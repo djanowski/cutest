@@ -159,7 +159,7 @@ private
     assert(actual == expected, "#{actual.inspect} != #{expected.inspect}")
   end
 
-  # Assert that the block doesn't raise the expected exception.
+  # Assert that the block raises an expected exception.
   def assert_raise(expected = Exception)
     begin
       yield
