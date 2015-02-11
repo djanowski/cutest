@@ -10,6 +10,12 @@ test "catches exceptions lower than StandardError" do
   end
 end
 
+test "raises if nothing raised" do
+  assert_raise(Cutest::AssertionFailed) do
+    assert_raise {}
+  end
+end
+
 test "raises if the expectation is not met" do
   assert_raise(Cutest::AssertionFailed) do
     assert_raise(RuntimeError) do
