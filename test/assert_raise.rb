@@ -1,3 +1,9 @@
+test "catches default exception" do
+  assert_raise do
+    raise
+  end
+end
+
 test "catches the right exception" do
   assert_raise(RuntimeError) do
     raise RuntimeError
