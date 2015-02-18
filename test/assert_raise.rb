@@ -4,7 +4,7 @@ test "catches the right exception" do
   end
 end
 
-test "can catch exceptions not inheriting from StandardError" do
+test "catches exceptions lower than StandardError" do
   assert_raise(NotImplementedError) do
     raise NotImplementedError
   end
