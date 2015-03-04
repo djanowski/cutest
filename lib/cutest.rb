@@ -164,7 +164,7 @@ private
   def assert_raise(expected = Exception)
     begin
       yield
-    rescue => exception
+    rescue expected => exception
       exception
     ensure
       flunk("got #{exception.inspect} instead") unless exception.kind_of?(expected)

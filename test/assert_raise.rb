@@ -4,6 +4,12 @@ test "catches the right exception" do
   end
 end
 
+test "catches exceptions lower than StandardError" do
+  assert_raise(NotImplementedError) do
+    raise NotImplementedError
+  end
+end
+
 test "raises if the expectation is not met" do
   assert_raise(Cutest::AssertionFailed) do
     assert_raise(RuntimeError) do
@@ -19,4 +25,3 @@ test "returns the exception" do
 
   assert_equal "error", exception.message
 end
-
