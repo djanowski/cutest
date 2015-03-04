@@ -92,7 +92,7 @@ private
     Thread.current[:cutest]
   end
 
-  # Create a class where the block will be evaluated. Recommended to improve
+  # Create an instance where the block will be evaluated. Recommended to improve
   # isolation between tests.
   def scope(name = nil, &block)
     if !cutest[:scope] || cutest[:scope] == name
