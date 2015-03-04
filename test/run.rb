@@ -48,7 +48,7 @@ test "output of an assertion with custom message" do
              "  file: test/fixtures/fail_custom_message.rb +7\n\n" +
              "Cutest::AssertionFailed: not empty\n\n"
 
-  out = %x{./bin/cutest test/fixtures/fail_custom_message.rb}
+  out = %x{./bin/cutest test/fixtures/fail_custom_assertion.rb}
 
   assert_equal(expected, out)
 end
