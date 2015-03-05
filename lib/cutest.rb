@@ -173,8 +173,9 @@ private
   # Stop the tests and raise an error where the message is the last line
   # executed before flunking.
   def flunk(message = nil)
+    backtrace = caller.find { |line| line.include? 'top (required)' }
     exception = Cutest::AssertionFailed.new(message)
-    exception.set_backtrace([caller[1]])
+    exception.set_backtrace(backtrace)
 
     raise exception
   end
