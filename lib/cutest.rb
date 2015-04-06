@@ -159,7 +159,7 @@ private
     assert(value == other, "#{value.inspect} != #{other.inspect}")
   end
 
-  # Assert that the block doesn't raise the expected exception.
+  # Assert that the block raises only the expected exception.
   def assert_raise(expected = Exception)
     begin
       yield
@@ -168,6 +168,14 @@ private
     ensure
       assert(exception.kind_of?(expected), "got #{exception.inspect} instead")
     end
+  end
+  
+  # Assert that the block raises no exceptions.
+  def assert_nothing_raised
+    yield
+    success
+  rescue Exception => exception
+    flunk("got #{exception.inspect} instead of nothing")
   end
 
   # Stop the tests and raise an error where the message is the last line
