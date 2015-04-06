@@ -149,15 +149,14 @@ private
   end
 
   # Assert that value is not nil or false.
-  def assert(value)
-    flunk("expression returned #{value.inspect}") unless value
+  def assert(value, msg = "expression returned #{value.inspect}")
+    flunk(msg) unless value
     success
   end
 
   # Assert that two values are equal.
   def assert_equal(value, other)
-    flunk("#{value.inspect} != #{other.inspect}") unless value == other
-    success
+    assert(value == other, "#{value.inspect} != #{other.inspect}")
   end
 
   # Assert that the block doesn't raise the expected exception.
@@ -167,16 +166,16 @@ private
     rescue expected => exception
       exception
     ensure
-      flunk("got #{exception.inspect} instead") unless exception.kind_of?(expected)
-      success
+      assert(exception.kind_of?(expected), "got #{exception.inspect} instead")
     end
   end
 
   # Stop the tests and raise an error where the message is the last line
   # executed before flunking.
   def flunk(message = nil)
+    backtrace = caller.find { |line| line.include? 'top (required)' }
     exception = Cutest::AssertionFailed.new(message)
-    exception.set_backtrace([caller[1]])
+    exception.set_backtrace(backtrace)
 
     raise exception
   end

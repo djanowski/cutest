@@ -41,11 +41,23 @@ test "exit code of failed run" do
   assert $?.to_i != 0
 end
 
+test "output of an assertion with custom message" do
+  expected = "\n" +
+             "  test: failed with custom message\n" +
+             "  line: assert(\"hello\".empty?, \"not empty\")\n" +
+             "  file: test/fixtures/fail_custom_message.rb +2\n\n" +
+             "Cutest::AssertionFailed: not empty\n\n"
+
+  out = %x{./bin/cutest test/fixtures/fail_custom_message.rb}
+
+  assert_equal(expected, out)
+end
+
 test "output of custom assertion" do
   expected = "\n" +
              "  test: failed custom assertion\n" +
              "  line: assert_empty \"foo\"\n" +
-             "  file: test/fixtures/fail_custom_assertion.rb +7\n\n" +
+             "  file: test/fixtures/fail_custom_assertion.rb +6\n\n" +
              "Cutest::AssertionFailed: not empty\n\n"
 
   out = %x{./bin/cutest test/fixtures/fail_custom_assertion.rb}
