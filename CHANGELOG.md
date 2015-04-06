@@ -3,6 +3,9 @@
 
 * `assert_raise` now works with lower-level exceptions.
 
+* `assert` can now receive a custom failure message, which should help write
+  better custom assertions.
+
 1.2.2 - 2014-11-05
 ==================
 
