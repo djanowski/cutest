@@ -154,9 +154,9 @@ private
     success
   end
 
-  # Assert that two values are equal.
-  def assert_equal(value, other)
-    assert(value == other, "#{value.inspect} != #{other.inspect}")
+  # Assert that actual and expected values are equal.
+  def assert_equal(actual, expected)
+    assert(actual == expected, "#{actual.inspect} != #{expected.inspect}")
   end
 
   # Assert that the block doesn't raise the expected exception.
