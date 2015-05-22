@@ -12,7 +12,7 @@ files = Clap.run ARGV,
   "-r"      => lambda { |file| require file },
   "-o"      => lambda { |name| cutest[:only] = name },
   "-s"      => lambda { |name| cutest[:scope] = name },
-  "-v"      => lambda { puts Cutest::VERSION }
+  "-v"      => lambda { puts Cutest::VERSION; exit }
 
 if files.any?
   success = Cutest.run(Dir[*files])

@@ -100,3 +100,11 @@ test "runs by given scope and test names" do
 
   assert_equal 0, $?.to_i
 end
+
+test "only prints the version" do
+  expected = "#{Cutest::VERSION}\n"
+
+  out = %x{./bin/cutest test/fixtures/success.rb -v}
+
+  assert_equal(expected, out)
+end
