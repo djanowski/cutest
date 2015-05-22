@@ -6,6 +6,8 @@
 * `assert` can now receive a custom failure message, which should help write
   better custom assertions.
 
+* Use `-b` to bail after first test failure
+
 1.2.2 - 2014-11-05
 ==================
 
