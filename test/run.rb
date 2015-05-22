@@ -100,3 +100,34 @@ test "runs by given scope and test names" do
 
   assert_equal 0, $?.to_i
 end
+
+scope "bail on first error" do
+  test "exit on the first error" do
+    expected = ".\n" +
+    "  test: \n" +
+    "  line: assert false\n" +
+    "  file: test/fixtures/outside_block.rb +5\n\n" +
+    "Cutest::AssertionFailed: expression returned false\n\n"
+
+    out = %x{./bin/cutest -b test/fixtures/outside_block.rb test/fixtures/failure.rb}
+
+    assert_equal(expected, out)
+  end
+
+  test "don't exit on the first error" do
+    expected = ".\n" +
+    "  test: \n" +
+    "  line: assert false\n" +
+    "  file: test/fixtures/outside_block.rb +5\n\n" +
+    "Cutest::AssertionFailed: expression returned false\n" +
+    "\n" +
+    "  test: failed assertion\n" +
+    "  line: assert false\n" +
+    "  file: test/fixtures/failure.rb +2\n\n" +
+    "Cutest::AssertionFailed: expression returned false\n\n"
+
+    out = %x{./bin/cutest test/fixtures/outside_block.rb test/fixtures/failure.rb}
+
+    assert_equal(expected, out)
+  end
+end

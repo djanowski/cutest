@@ -7,8 +7,7 @@ Description
 -----------
 
 Each test file is run in a forked process to avoid shared state. Once a failure
-is found, you get a report detailing what failed and how to locate the error
-and the rest of the file is skipped.
+is found, you get a report detailing what failed and how to locate the error.
 
 You can use the `scope` command around tests: it guarantees that no instance
 variables are shared between tests.
@@ -148,6 +147,8 @@ with test helpers, use the `-r` flag:
     $ cutest -r ./test/helper.rb ./test/*_test.rb
 
 If you want to check which version you are running, try the `-v` flag.
+
+To bail after first test failure, use the `-b` flag.
 
 Installation
 ------------

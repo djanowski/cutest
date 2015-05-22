@@ -6,15 +6,14 @@ class Cutest
   end
 
   def self.run(files)
-    status = files.all? do |file|
+    test_results = -> (file) do
       run_file(file)
-
       Process.wait2.last.success?
     end
 
-    puts
-
-    status
+    cutest[:bail] ?
+      files.all?(&test_results) :
+      files.map(&test_results).all?
   end
 
   def self.run_file(file)
