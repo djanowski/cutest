@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 if ARGV.empty?
-  puts "usage: cutest [-v] [-r lib] [-o test] [-s scope] file ..."
+  puts "usage: cutest [-v] [-b] [-r lib] [-o test] [-s scope] file ..."
   exit
 end
 
@@ -12,10 +12,11 @@ files = Clap.run ARGV,
   "-r"      => lambda { |file| require file },
   "-o"      => lambda { |name| cutest[:only] = name },
   "-s"      => lambda { |name| cutest[:scope] = name },
+  "-b"      => lambda { cutest[:bail] = true },
   "-v"      => lambda { puts Cutest::VERSION }
 
 if files.any?
   success = Cutest.run(Dir[*files])
-
+  puts
   exit(1) unless success
 end
