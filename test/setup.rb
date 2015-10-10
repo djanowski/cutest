@@ -1,9 +1,9 @@
 setup do
-  {:a => 23, :b => 43}
+  {a: 23, b: 43}
 end
 
 test "should receive the result of the setup block as a parameter" do |params|
-  assert params == {:a => 23, :b => 43}
+  assert params == {a: 23, b: 43}
 end
 
 test "if the params are modified..." do |params|
