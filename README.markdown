@@ -1,6 +1,8 @@
 Cutest
 =======
 
+[![Gem Version](https://badge.fury.io/rb/cutest.svg)](https://badge.fury.io/rb/cutest)
+
 Forking tests.
 
 Description
@@ -51,51 +53,55 @@ In your terminal:
 
 In your tests:
 
-    setup do
-      {:a => 23, :b => 43}
-    end
+````ruby
+setup do
+  {:a => 23, :b => 43}
+end
 
-    test "should receive the result of the setup block as a parameter" do |params|
-      assert params == {:a => 23, :b => 43}
-    end
+test "should receive the result of the setup block as a parameter" do |params|
+  assert params == {:a => 23, :b => 43}
+end
 
-    test "should evaluate the setup block before each test" do |params|
-      params[:a] = nil
-    end
+test "should evaluate the setup block before each test" do |params|
+  params[:a] = nil
+end
 
-    test "should preserve the original values from the setup" do |params|
-      assert 23 == params[:a]
-    end
+test "should preserve the original values from the setup" do |params|
+  assert 23 == params[:a]
+end
+```
 
 An example working with a prepare block:
+````ruby
+prepare do
+  Ohm.flush
+end
 
-    prepare do
-      Ohm.flush
-    end
+setup do
+  Ohm.redis.get("foo")
+end
 
-    setup do
-      Ohm.redis.get("foo")
-    end
-
-    test do |foo|
-      assert foo.nil?
-    end
+test do |foo|
+  assert foo.nil?
+end
+````
 
 And working with scopes:
+````ruby
+setup do
+  @foo = true
+end
 
-    setup do
-      @foo = true
-    end
+@bar = true
 
-    @bar = true
-
-    scope do
-      test "should not share instance variables" do |foo|
-        assert !defined?(@foo)
-        assert !defined?(@bar)
-        assert foo == true
-      end
-    end
+scope do
+  test "should not share instance variables" do |foo|
+    assert !defined?(@foo)
+    assert !defined?(@bar)
+    assert foo == true
+  end
+end
+````
 
 The tests in these two examples will pass.
 
@@ -103,41 +109,43 @@ Unlike other testing frameworks, Cutest does not compile all the tests before
 running them.
 
 A simple example for adding a custom `empty` assertion:
+````ruby
+def assert_empty(string)
+  assert(string.empty?, "not empty")
+end
 
-    def assert_empty(string)
-      assert(string.empty?, "not empty")
-    end
-
-    test "failed custom assertion" do
-      assert_empty "foo"
-    end
+test "failed custom assertion" do
+  assert_empty "foo"
+end
+````
 
 Handling errors
 ---------------
 
 If you get an error when running the tests, this is what you will see:
-
-    Exception: assert_equal 24, params[:a] # 24 != 23
-    test/setup.rb +14
-
+````bash
+Exception: assert_equal 24, params[:a] # 24 != 23
+test/setup.rb +14
+````
 Running the build
 -----------------
 
 Using Rake:
+````ruby
+task :test do
+  exec "cutest test/*.rb"
+end
 
-    task :test do
-      exec "cutest test/*.rb"
-    end
-
-    task :default => :test
+task :default => :test
+````
 
 Using Make:
+````yml
+.PHONY: test
 
-    .PHONY: test
-
-    test:
-      cutest test/*.rb
-
+test:
+  cutest test/*.rb
+````
 Command-line interface
 ----------------------
 
