@@ -6,6 +6,8 @@
 * `assert` can now receive a custom failure message, which should help write
   better custom assertions.
 
+* `cutest -v` now exits after printing the version number.
+
 1.2.2 - 2014-11-05
 ==================
 
