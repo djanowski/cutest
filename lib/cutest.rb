@@ -1,7 +1,7 @@
 class Cutest
   unless defined?(VERSION)
     VERSION = "1.2.2"
-    FILTER = %r[/(ruby|jruby|rbx)[-/]([0-9\.])+]
+    NOISE = Gem.path + $LOAD_PATH.reject{ |path| File.expand_path(path).start_with?(Dir.pwd) }
     CACHE = Hash.new { |h, k| h[k] = File.readlines(k) }
   end
 
@@ -28,16 +28,11 @@ class Cutest
 
       rescue StandardError
         trace = $!.backtrace
-        pivot = trace.index { |line| line.match(file) }
 
         puts "\n  test: %s" % cutest[:test]
 
-        if pivot
-          other = trace[0..pivot].select { |line| line !~ FILTER }
-          other.reverse.each { |line| display_trace(line) }
-        else
-          display_trace(trace.first)
-        end
+        other = trace.select { |line| NOISE.none? { |noise| line.start_with?(noise) } }
+        other.reverse.each { |line| display_trace(line) }
 
         display_error
 
