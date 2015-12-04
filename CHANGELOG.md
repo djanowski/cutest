@@ -1,5 +1,5 @@
-(unreleased)
-============
+1.2.3 - 2015-12-04
+==================
 
 * `assert_raise` now works with lower-level exceptions.
 
