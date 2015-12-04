@@ -1,3 +1,9 @@
+test "catches default exception" do
+  assert_raise do
+    raise
+  end
+end
+
 test "catches the right exception" do
   assert_raise(RuntimeError) do
     raise RuntimeError
@@ -7,6 +13,12 @@ end
 test "catches exceptions lower than StandardError" do
   assert_raise(NotImplementedError) do
     raise NotImplementedError
+  end
+end
+
+test "raises if nothing raised" do
+  assert_raise(Cutest::AssertionFailed) do
+    assert_raise {}
   end
 end
 
