@@ -161,13 +161,13 @@ private
 
   # Assert that the block raises an expected exception.
   def assert_raise(expected = Exception)
-    begin
-      yield
-    rescue expected => exception
-      exception
-    ensure
-      assert(exception.kind_of?(expected), "got #{exception.inspect} instead")
-    end
+    result = yield
+  rescue expected => actual
+    actual
+  rescue => actual
+    actual
+  ensure
+    assert(actual.kind_of?(expected), "got #{(actual || result).inspect} instead")
   end
 
   # Stop the tests and raise an error where the message is the last line
