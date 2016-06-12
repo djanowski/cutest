@@ -37,7 +37,7 @@ The `test` method executes the passed block after running `prepare` and
 Three assertions are available: `assert`, that accepts a value and raises
 if it's false or nil; `assert_equal`, that raises if its arguments are not
 equal; and `assert_raise`, that executes a passed block and compares the raised
-exception to the expected one. In all cases, if the expectation is no met, an
+exception to the expected one. In all cases, if the expectation is not met, an
 `AssertionFailed` exception is raised.
 
 You can customize the output of `assert` by providing a second argument with
