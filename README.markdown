@@ -69,7 +69,7 @@ end
 test "should preserve the original values from the setup" do |params|
   assert 23 == params[:a]
 end
-```
+````
 
 An example working with a prepare block:
 ````ruby
