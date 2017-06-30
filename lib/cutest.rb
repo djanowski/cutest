@@ -85,7 +85,7 @@ private
 
   # Use Thread.current[:cutest] to store information about test preparation
   # and setup.
-  Thread.current[:cutest] ||= { :prepare => [] }
+  Thread.current[:cutest] ||= { prepare: [] }
 
   # Shortcut to access Thread.current[:cutest].
   def cutest
