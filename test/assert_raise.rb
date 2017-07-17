@@ -38,6 +38,30 @@ test "returns the exception" do
   assert_equal "error", exception.message
 end
 
+test "provides a helpful error message" do
+  exception = assert_raise(Cutest::AssertionFailed) do
+    assert_raise(RuntimeError) do
+      raise ArgumentError
+    end
+  end
+
+  assert_equal "got #<ArgumentError: ArgumentError> instead", exception.message
+
+  exception = assert_raise(Cutest::AssertionFailed) do
+    assert_raise { "foo" }
+  end
+
+  assert_equal "got \"foo\" instead", exception.message
+end
+
+test "considers an exception as return value a failure" do
+  assert_raise(Cutest::AssertionFailed) do
+    assert_raise(RuntimeError) do
+      RuntimeError.new
+    end
+  end
+end
+
 test "catches a custom exception" do
   assert_raise do
     raise Class.new(Exception)
